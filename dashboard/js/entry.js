@@ -85,8 +85,8 @@ let dataObject = {
 // Sensor-specific objects that hold sensor readings even when different sensors are active
 let temperatureHumidityData = {
   labels: [],
-  data1T: [],
-  data2H: []
+  data: []
+  // data2H: []
 };
 
 let gasData = {

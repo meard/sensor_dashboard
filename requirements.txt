@@ -1,3 +1,4 @@
 adafruit-circuitpython-dht
 platformio
 paho-mqtt
+wifi

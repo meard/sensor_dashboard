@@ -76,7 +76,7 @@ void loop() {
   // Take a reading from the sensor and publish an MQTT message with its value
   int value = analogRead(32);
   client.publish("iothackday/dfe/sensor/distance", String(value).c_str());
-
+  
   // Send the sensor value over Serial as well for debugging
   Serial.println(value);
 
