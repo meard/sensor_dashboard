@@ -74,7 +74,8 @@ gulp.task('watch', () => {
 gulp.task('serve', () => {
   connect.server({
     root: './',
-    port: '8080',
+    port: '5050',
+    open: true,
     livereload: true
   });
 });
@@ -82,7 +83,7 @@ gulp.task('serve', () => {
 gulp.task('open', () => {
   return gulp.src('./index.html')
     .pipe(open({
-      uri: 'http://localhost:8080'
+      uri: 'http://localhost:5050'
     }));
 });
 
