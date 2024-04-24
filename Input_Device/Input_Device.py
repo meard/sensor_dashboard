@@ -15,8 +15,11 @@ import wifi
 import RPi.GPIO as GPIO
 import dht11
 
+
 class client_inputDevice:
     def __init__(self):
+        print("[INFO] Setting up primary initilizations")
+
         self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
         self.client_server = "test.mosquitto.org"
         # self.ssid = ""
@@ -41,7 +44,7 @@ class client_inputDevice:
                 exit(0)
 
         print("[INFO]Setting up MQTT Server...")
-
+        time.sleep(3)
         client.on_connect = on_connect
         client.connect_async(client_server, 1883)
 
@@ -66,6 +69,9 @@ class client_inputDevice:
         #     sys.exit()
 
     def temperatureHumiditySensor(self):
+        print("[INFO] Initializing Temperature Sensor Thread ")
+        time.sleep(3)
+
         # read data using pin 17
         dht_channel = dht11.DHT11(pin=17)
         os.chdir('sensorData')
@@ -93,6 +99,9 @@ class client_inputDevice:
             GPIO.cleanup()
 
     def gasSensor(self):
+        print("[INFO] Initializing Gas Sensor Thread ")
+        time.sleep(3)
+
         gas_channel = 7  # Replace with the actual GPIO pin number
         gas_state = 0
         GPIO.setup(gas_channel, GPIO.IN)
@@ -127,6 +136,9 @@ class client_inputDevice:
             GPIO.cleanup()
 
     def tiltSensor(self):
+        print("[INFO] Initializing Tilt Sensor Thread ")
+        time.sleep(3)
+
         tilt_channel = 21
         tilt_state = 0
         GPIO.setup(tilt_channel, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -158,7 +170,10 @@ class client_inputDevice:
             GPIO.cleanup()
 
     def vibrationSensor(self):
-        vibration_channel = 17
+        print("[INFO] Initializing Vibration Sensor Thread ")
+        time.sleep(3)
+
+        vibration_channel = 27
         vibration_state = 0
         GPIO.setup(vibration_channel, GPIO.IN)
         os.chdir('sensorData')
@@ -189,6 +204,8 @@ class client_inputDevice:
             GPIO.cleanup()
 
     def run(self, client):
+        print("[INFO] Initializing primary sensor threads ")
+        time.sleep(3)
         while True:
             try:
                 # Reconnect to MQTT broker if dropped
@@ -221,14 +238,17 @@ class client_inputDevice:
                 t4.join()
 
             except (KeyboardInterrupt, SystemExit):
-                print("Dashboard stopped by User")
+                print("[INFO]Dashboard stopped by User")
 
             finally:
                 # Stop MQTT server Clean up GPIO settings
+                print("[INFO] Intializing Clean exit and GPIO cleanup")
                 time.sleep(1)
                 GPIO.cleanup()
+                print("[INFO] Cleanup Done. Exiting Now")
                 sys.exit()
 
 
 if __name__ == "__main__":
+    print("[INFO] Initializing Sensor Data")
     client_input_obj = client_inputDevice()
