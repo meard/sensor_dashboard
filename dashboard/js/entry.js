@@ -169,7 +169,7 @@ window.addEventListener('DOMContentLoaded', function (e) {
     currentSensor = e.target.value;
 
     switch (currentSensor) {
-      case 'temperatureAndhumidity':
+      case 'temperature':
         currentSensorData = temperatureHumidityData;
         resetDataTable();
         break;
@@ -403,7 +403,7 @@ function processMessages(topic, message) {
 
       // Add to total reading count for this sensor
       switch (currentSensor) {
-        case 'temperatureAndhumidity':
+        case 'temperature':
           totalReadings.temperatureHumidity++;
           break;
 
@@ -471,7 +471,7 @@ function displayTriggerCount() {
   let currentTriggers;
 
   switch (currentSensor) {
-    case 'temperatureAndhumidity':
+    case 'temperature':
       currentTriggers = triggers.temperatureHumidity;
       break;
 
@@ -497,7 +497,7 @@ function displayTotalReadings() {
   let readingsSoFarEl = document.querySelector('#readings-so-far .value');
 
   switch (currentSensor) {
-    case 'temperatureAndhumidity':
+    case 'temperature':
       readingsSoFarEl.innerHTML = totalReadings.temperatureHumidity;
       break;
 
@@ -532,7 +532,7 @@ function addNewTrigger(e) {
   let currentTriggers;
 
   switch (currentSensor) {
-    case 'temperatureAndhumidity':
+    case 'temperature':
       currentTriggers = triggers.temperatureHumidity;
       break;
 
@@ -607,7 +607,7 @@ function removeTrigger(trigger) {
   let currentTriggers;
 
   switch (currentSensor) {
-    case 'temperatureAndhumidity':
+    case 'temperature':
       currentTriggers = triggers.temperatureHumidity;
       break;
 
@@ -642,7 +642,7 @@ function displayTriggers() {
   let currentTriggers;
 
   switch (currentSensor) {
-    case 'temperatureAndhumidity':
+    case 'temperature':
       currentTriggers = triggers.temperatureHumidity;
       break;
 
