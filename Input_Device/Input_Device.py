@@ -39,10 +39,10 @@ class client_inputDevice:
         # Send keep-alive message so dashboard knows we're still connected
         while True:
             if (sensor):
-                print("Sensor Status: {}", sensor)
+                print("Sensor Status: {}".format(str(sensor)))
                 self.client.publish("iothackday/dfe/input-device", "online")
             else:
-                print("Sensor Status: {}", sensor)
+                print("Sensor Status: {}".format(str(sensor)))
                 self.client.publish("iothackday/dfe/input-device", "offline")
 
     def temperatureHumiditySensor(self):
