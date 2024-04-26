@@ -204,7 +204,7 @@ class client_inputDevice:
                     target=self.vibrationSensor, name="vibration")
 
                 t5 = threading.Thread(
-                    target=self.sensorStatus, name="Sensor Status", args=(t1.is_alive(),))
+                    target=self.sensorStatus, name="Sensor Status", args=(True,))
 
                 t1.daemon = True
                 t2.daemon = True
