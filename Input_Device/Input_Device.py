@@ -22,51 +22,18 @@ class client_inputDevice:
 
         self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
         self.client_server = "test.mosquitto.org"
-        # self.ssid = ""
-        # self.password = ""
-        # self.isConnected = False
 
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
-
-        # self.set_network(self.client, self.client_server,
-        #                  self.ssid, self.password)
 
         self.set_network(self.client, self.client_server)
         self.run(self.client)
 
     def set_network(self, client, client_server):
-        # def on_connect(client, userdata, flags, rc):
-        #     if rc == 0:
-        #         print("Connected to MQTT Broker!")
-        #     else:
-        #         print("Failed to connect, return code %d\n", rc)
-        #         exit(0)
-
         print("[INFO]Setting up MQTT Server...")
         time.sleep(3)
-        # client.on_connect = on_connect
         client.connect_async(client_server, 1883)
-
         time.sleep(5)
-        # print("[INFO]Setting up Local Network...")
-        # wifi_scanner = wifi.Cell.all('wlan0')
-
-        # for cell in wifi_scanner:
-        #     if cell.ssid == ssid:
-        #         scheme = wifi.Scheme.for_cell('wlan0', ssid, cell, password)
-        #         scheme.save()
-        #         scheme.activate()
-        #         self.isConnected = True
-        #         break
-
-        # if self.isConnected:
-        #     print(f"Connected to network: {ssid}")
-        #     return
-
-        # else:
-        #     print(f"Unable to find network: {ssid}")
-        #     sys.exit()
 
     def sensorStatus(self, sensor):
         # Send keep-alive message so dashboard knows we're still connected
@@ -95,6 +62,9 @@ class client_inputDevice:
                     with open(log_file, 'w', newline='', encoding='utf-8') as csv_file:
                         writer = csv.writer(csv_file)
                         writer.writerows(str(result.temperature))
+                    
+                    print("Temp:{} C".format(str(result.temperature)))
+
                     csv_file.close()
                 # Wait for a short period before reading again
                 time.sleep(2)
@@ -133,6 +103,9 @@ class client_inputDevice:
                 with open(log_file, 'w', newline='', encoding='utf-8') as csv_file:
                     writer = csv.writer(csv_file)
                     writer.writerows(str(gas_state))
+
+                print("Gas State:{} C".format(str(gas_state)))
+
                 csv_file.close()
                 time.sleep(2)  # Wait for a short period before reading again
         except RuntimeError as err:
@@ -167,6 +140,7 @@ class client_inputDevice:
                 with open(log_file, 'w', newline='', encoding='utf-8') as csv_file:
                     writer = csv.writer(csv_file)
                     writer.writerows(str(tilt_state))
+                print("Tilt State:{} C".format(str(tilt_state)))
                 csv_file.close()
                 time.sleep(2)  # Wait for a short period before reading again
         except RuntimeError as err:
@@ -202,6 +176,7 @@ class client_inputDevice:
                     writer = csv.writer(csv_file)
                     writer.writerows(str(vibration_state))
                     csv_file.close()
+                print("Tilt State:{} C".format(str(vibration_state)))
                 time.sleep(2)  # Wait for a short period before reading again
         except RuntimeError as err:
             f.close()
