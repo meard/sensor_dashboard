@@ -39,8 +39,10 @@ class client_inputDevice:
         # Send keep-alive message so dashboard knows we're still connected
         while True:
             if (sensor):
+                print("Sensor Status: {}", sensor)
                 self.client.publish("iothackday/dfe/input-device", "online")
             else:
+                print("Sensor Status: {}", sensor)
                 self.client.publish("iothackday/dfe/input-device", "offline")
 
     def temperatureHumiditySensor(self):
@@ -63,7 +65,7 @@ class client_inputDevice:
                         writer = csv.writer(csv_file)
                         writer.writerows(str(result.temperature))
                     
-                    print("Temp:{} C".format(str(result.temperature)))
+                    # print("Temp:{} C".format(str(result.temperature)))
 
                     csv_file.close()
                 # Wait for a short period before reading again
@@ -104,7 +106,7 @@ class client_inputDevice:
                     writer = csv.writer(csv_file)
                     writer.writerows(str(gas_state))
 
-                print("Gas State:{} C".format(str(gas_state)))
+                # print("Gas State:{} C".format(str(gas_state)))
 
                 csv_file.close()
                 time.sleep(2)  # Wait for a short period before reading again
@@ -140,7 +142,7 @@ class client_inputDevice:
                 with open(log_file, 'w', newline='', encoding='utf-8') as csv_file:
                     writer = csv.writer(csv_file)
                     writer.writerows(str(tilt_state))
-                print("Tilt State:{} C".format(str(tilt_state)))
+                # print("Tilt State:{} C".format(str(tilt_state)))
                 csv_file.close()
                 time.sleep(2)  # Wait for a short period before reading again
         except RuntimeError as err:
@@ -176,7 +178,7 @@ class client_inputDevice:
                     writer = csv.writer(csv_file)
                     writer.writerows(str(vibration_state))
                     csv_file.close()
-                print("Tilt State:{} C".format(str(vibration_state)))
+                # print("Tilt State:{} C".format(str(vibration_state)))
                 time.sleep(2)  # Wait for a short period before reading again
         except RuntimeError as err:
             f.close()
