@@ -38,12 +38,12 @@ class client_inputDevice:
     def sensorStatus(self, sensor):
         # Send keep-alive message so dashboard knows we're still connected
         while True:
-            if (sensor):
-                print("Sensor Status: {}".format(str(sensor)))
-                self.client.publish("iothackday/dfe/input-device", "online")
+            if (self.client.is_connected()):
+                print("Sensor Status: {}".format(str(self.client.is_connected())))
+                self.client.publish("iothackday/dfe/input-device", "true")
             else:
-                print("Sensor Status: {}".format(str(sensor)))
-                self.client.publish("iothackday/dfe/input-device", "offline")
+                print("Sensor Status: {}".format(str(self.client.is_connected())))
+                self.client.publish("iothackday/dfe/input-device", "false")
 
     def temperatureHumiditySensor(self):
         print("[INFO] Initializing Temperature Sensor Thread ")
@@ -229,10 +229,15 @@ class client_inputDevice:
 
             finally:
                 # Stop MQTT server Clean up GPIO settings
+                self.client.disconnect()
                 print("[INFO] Intializing Clean exit and GPIO cleanup")
                 time.sleep(1)
                 GPIO.cleanup()
                 print("[INFO] Cleanup Done. Exiting Now")
+                for i in range(0, 10):
+                    self.client.publish("iothackday/dfe/input-device", "false")
+                
+
                 sys.exit()
 
 

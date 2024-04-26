@@ -332,14 +332,13 @@ function processMessages(topic, message) {
     case inputDeviceStatusTopic:
       let sensor_status = message;
       let status = new TextDecoder('utf-8').decode(sensor_status);
-
-      if (status == "online" ) {
-        inputDeviceOnline = true;
+      console.log(status);
+      if (status == "true") {
+        inputDeviceOnline = !inputDeviceOnline;
         displayDeviceStatus();
       }
-
-      else if (status == "offline" ) {
-        inputDeviceOnline = false;
+      else if (status == "false"){
+        inputDeviceOnline = !inputDeviceOnline;
         displayDeviceStatus();
       }
 
@@ -732,6 +731,7 @@ function checkDevices() {
 
 // Display the current status of each device at the top of the page
 function displayDeviceStatus() {
+  console.log("Input Device Status: "+inputDeviceOnline);
   // Display input device status
   let connectedEl = inputDeviceStatusEl.querySelector('.connected');
   let notConnectedEl = inputDeviceStatusEl.querySelector('.not-connected');
