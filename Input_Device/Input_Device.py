@@ -68,6 +68,14 @@ class client_inputDevice:
         #     print(f"Unable to find network: {ssid}")
         #     sys.exit()
 
+    def sensorStatus(self, sensor):
+        # Send keep-alive message so dashboard knows we're still connected
+        while True:
+            if (sensor):
+                self.client.publish("iothackday/dfe/input-device", "online")
+            else:
+                self.client.publish("iothackday/dfe/input-device", "offline")
+
     def temperatureHumiditySensor(self):
         print("[INFO] Initializing Temperature Sensor Thread ")
         time.sleep(3)
@@ -211,9 +219,6 @@ class client_inputDevice:
                 client.loop_start()
                 time.sleep(5)
 
-                # Send keep-alive message so dashboard knows we're still connected
-                client.publish("iothackday/dfe/input-device", "online")
-
                 t1 = threading.Thread(
                     target=self.temperatureHumiditySensor, name="temperatureHumiditySensor")
                 t2 = threading.Thread(target=self.gasSensor, name="gas")
@@ -221,20 +226,26 @@ class client_inputDevice:
                 t4 = threading.Thread(
                     target=self.vibrationSensor, name="vibration")
 
+                t5 = threading.Thread(
+                    target=self.sensorStatus, name="Sensor Status", args=(t1.is_alive(),))
+
                 t1.daemon = True
                 t2.daemon = True
                 t3.daemon = True
                 t4.daemon = True
+                t5.daemon = True
 
                 t1.start()
                 t2.start()
                 t3.start()
                 t4.start()
+                t5.start()
 
                 t1.join()
                 t2.join()
                 t3.join()
                 t4.join()
+                t5.join()
 
             except (KeyboardInterrupt, SystemExit):
                 print("[INFO]Dashboard stopped by User")

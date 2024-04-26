@@ -158,7 +158,7 @@ window.addEventListener('DOMContentLoaded', function (e) {
   });
 
   // Periodically check input/output devices for keep-alive messages
-  setInterval(checkDevices, 3000);
+  // setInterval(checkDevices, 3000);
 
   // Add a new trigger when "Add Trigger" button is clicked
   let addTriggerButton = document.querySelector('#add-trigger-panel button[type="submit"]');
@@ -188,6 +188,7 @@ window.addEventListener('DOMContentLoaded', function (e) {
         currentSensorData = vibrationData;
         resetDataTable();
         break;
+
     }
 
     displayTriggers();
@@ -228,70 +229,70 @@ window.addEventListener('DOMContentLoaded', function (e) {
 });
 
 
-//==========================
-//  Mock data creation
-//==========================
-if (mockDataEnabled) {
-  setInterval(createMockInputData, 100);
-  setInterval(createMockKeepAliveMessages, 500);
+// //==========================
+// //  Mock data creation
+// //==========================
+// if (mockDataEnabled) {
+//   setInterval(createMockInputData, 100);
+//   setInterval(createMockKeepAliveMessages, 500);
 
-  // Artificially set input and output device statuses to "online" within 5s of page load
-  setTimeout(() => {
-    inputDeviceOnline = true;
-    inputDeviceFirstPing = true;
-    displayDeviceStatus();
-  }, getRandomInt(1500, 4000));
+//   // Artificially set input and output device statuses to "online" within 5s of page load
+//   setTimeout(() => {
+//     inputDeviceOnline = true;
+//     inputDeviceFirstPing = true;
+//     displayDeviceStatus();
+//   }, getRandomInt(1500, 4000));
 
-  setTimeout(() => {
-    outputDeviceOnline = true;
-    outputDeviceFirstPing = true;
-    displayDeviceStatus();
-  }, getRandomInt(1500, 4000));
-}
+//   setTimeout(() => {
+//     outputDeviceOnline = true;
+//     outputDeviceFirstPing = true;
+//     displayDeviceStatus();
+//   }, getRandomInt(1500, 4000));
+// }
 
-// Generate random data for the active sensor, if the input device is online
-function createMockInputData() {
-  if (inputDeviceOnline && mockDataEnabled) {
-    if (mockDataCurrent != mockDataTarget) {
-      if (mockDataCurrent + mockDataVelocity < mockDataTarget) {
-        mockDataCurrent += mockDataVelocity;
-      } else if (mockDataCurrent - mockDataVelocity > mockDataTarget) {
-        mockDataCurrent -= mockDataVelocity;
-      }
-    } else {
-      mockDataTarget = getRandomInt(0, 4096);
-    }
+// // Generate random data for the active sensor, if the input device is online
+// function createMockInputData() {
+//   if (inputDeviceOnline && mockDataEnabled) {
+//     if (mockDataCurrent != mockDataTarget) {
+//       if (mockDataCurrent + mockDataVelocity < mockDataTarget) {
+//         mockDataCurrent += mockDataVelocity;
+//       } else if (mockDataCurrent - mockDataVelocity > mockDataTarget) {
+//         mockDataCurrent -= mockDataVelocity;
+//       }
+//     } else {
+//       mockDataTarget = getRandomInt(0, 4096);
+//     }
 
-    // Send random data on appropriate MQTT topics
-    switch (currentSensor) {
-      case 'distance':
-        processMessages(inputDeviceDistanceSensorTopic, mockDataCurrent);
-        break;
+//     // Send random data on appropriate MQTT topics
+//     switch (currentSensor) {
+//       case 'distance':
+//         processMessages(inputDeviceDistanceSensorTopic, mockDataCurrent);
+//         break;
 
-      case 'temperature':
-        processMessages(inputDeviceTemperatureSensorTopic, mockDataCurrent);
-        break;
+//       case 'temperature':
+//         processMessages(inputDeviceTemperatureSensorTopic, mockDataCurrent);
+//         break;
 
-      case 'light':
-        processMessages(inputDeviceLightSensorTopic, mockDataCurrent);
-        break;
+//       case 'light':
+//         processMessages(inputDeviceLightSensorTopic, mockDataCurrent);
+//         break;
 
-    }
-  }
-}
+//     }
+//   }
+// }
 
-// Generate fake "keep alive" messages as though devices were online
-function createMockKeepAliveMessages() {
-  if (mockDataEnabled) {
-    if (inputDeviceFirstPing) {
-      processMessages(inputDeviceStatusTopic, 'online');
-    }
+// // Generate fake "keep alive" messages as though devices were online
+// function createMockKeepAliveMessages() {
+//   if (mockDataEnabled) {
+//     if (inputDeviceFirstPing) {
+//       processMessages(inputDeviceStatusTopic, 'online');
+//     }
 
-    if (outputDeviceFirstPing) {
-      processMessages(outputDeviceStatusTopic, 'online');
-    }
-  }
-}
+//     if (outputDeviceFirstPing) {
+//       processMessages(outputDeviceStatusTopic, 'online');
+//     }
+//   }
+// }
 
 
 //=======================================
@@ -329,10 +330,23 @@ function processMessages(topic, message) {
   switch (topic) {
     // Input device has sent keep-alive message
     case inputDeviceStatusTopic:
-      if (!inputDeviceOnline) {
+      let sensor_status = message;
+      let status = new TextDecoder('utf-8').decode(sensor_status);
+
+      if (status == "online" ) {
         inputDeviceOnline = true;
         displayDeviceStatus();
       }
+
+      else if (status == "offline" ) {
+        inputDeviceOnline = false;
+        displayDeviceStatus();
+      }
+
+      // if (!inputDeviceOnline) {
+      //   inputDeviceOnline = true;
+      //   displayDeviceStatus();
+      // }
 
       break;
 
@@ -486,6 +500,7 @@ function displayTriggerCount() {
     case 'vibration':
       currentTriggers = triggers.vibration;
       break;
+      
   }
 
   let triggerCountEl = document.querySelector('#triggers-set-up .value');
@@ -576,7 +591,7 @@ function addNewTrigger(e) {
 
       <div class="name">
         <span class="visually-hidden">The </span>
-        Motor
+          3d Printer
       </div>
 
       <div class="action">
