@@ -20,7 +20,7 @@ class client_inputDevice:
     def __init__(self):
         print("[INFO] Setting up primary initilizations")
 
-        self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
+        self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
         self.client_server = "test.mosquitto.org"
         # self.ssid = ""
         # self.password = ""
@@ -36,16 +36,16 @@ class client_inputDevice:
         self.run(self.client)
 
     def set_network(self, client, client_server):
-        def on_connect(client, userdata, flags, rc):
-            if rc == 0:
-                print("Connected to MQTT Broker!")
-            else:
-                print("Failed to connect, return code %d\n", rc)
-                exit(0)
+        # def on_connect(client, userdata, flags, rc):
+        #     if rc == 0:
+        #         print("Connected to MQTT Broker!")
+        #     else:
+        #         print("Failed to connect, return code %d\n", rc)
+        #         exit(0)
 
         print("[INFO]Setting up MQTT Server...")
         time.sleep(3)
-        client.on_connect = on_connect
+        # client.on_connect = on_connect
         client.connect_async(client_server, 1883)
 
         time.sleep(5)
@@ -74,8 +74,7 @@ class client_inputDevice:
 
         # read data using pin 17
         dht_channel = dht11.DHT11(pin=17)
-        os.chdir('sensorData')
-        log_file = str(time.strftime("%Y%m%d-%H%M%S")) + \
+        log_file = 'sensorData/'+str(time.strftime("%Y%m%d-%H%M%S")) + \
             '_sensor_Temperature_Humidity.csv'
         f = open(log_file, "x", encoding='utf-8')
         try:
@@ -87,7 +86,7 @@ class client_inputDevice:
                     # generate .csv log file
                     with open(log_file, 'w', newline='', encoding='utf-8') as csv_file:
                         writer = csv.writer(csv_file)
-                        writer.writerow(result.temperature)
+                        writer.writerows(str(result.temperature))
                     csv_file.close()
                 # Wait for a short period before reading again
                 time.sleep(2)
@@ -104,9 +103,9 @@ class client_inputDevice:
 
         gas_channel = 7  # Replace with the actual GPIO pin number
         gas_state = 0
+        GPIO.setmode(GPIO.BCM)
         GPIO.setup(gas_channel, GPIO.IN)
-        os.chdir('sensorData')
-        log_file = str(time.strftime("%Y%m%d-%H%M%S")) + \
+        log_file = 'sensorData/'+str(time.strftime("%Y%m%d-%H%M%S")) + \
             '_sensor_Gas.csv'
         f = open(log_file, "x", encoding='utf-8')
         try:
@@ -125,7 +124,7 @@ class client_inputDevice:
                 # generate .csv log file
                 with open(log_file, 'w', newline='', encoding='utf-8') as csv_file:
                     writer = csv.writer(csv_file)
-                    writer.writerow(gas_state)
+                    writer.writerows(str(gas_state))
                 csv_file.close()
                 time.sleep(2)  # Wait for a short period before reading again
         except RuntimeError as err:
@@ -141,9 +140,9 @@ class client_inputDevice:
 
         tilt_channel = 21
         tilt_state = 0
+        GPIO.setmode(GPIO.BCM)
         GPIO.setup(tilt_channel, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        os.chdir('sensorData')
-        log_file = str(time.strftime("%Y%m%d-%H%M%S")) + \
+        log_file = 'sensorData/'+str(time.strftime("%Y%m%d-%H%M%S")) + \
             '_sensor_Tilt.csv'
         f = open(log_file, "x", encoding='utf-8')
         try:
@@ -159,7 +158,7 @@ class client_inputDevice:
                 # generate .csv log file
                 with open(log_file, 'w', newline='', encoding='utf-8') as csv_file:
                     writer = csv.writer(csv_file)
-                    writer.writerow(tilt_state)
+                    writer.writerows(str(tilt_state))
                 csv_file.close()
                 time.sleep(2)  # Wait for a short period before reading again
         except RuntimeError as err:
@@ -173,11 +172,11 @@ class client_inputDevice:
         print("[INFO] Initializing Vibration Sensor Thread ")
         time.sleep(3)
 
-        vibration_channel = 27
+        vibration_channel = 22
         vibration_state = 0
+        GPIO.setmode(GPIO.BCM)
         GPIO.setup(vibration_channel, GPIO.IN)
-        os.chdir('sensorData')
-        log_file = str(time.strftime("%Y%m%d-%H%M%S")) + \
+        log_file = 'sensorData/'+str(time.strftime("%Y%m%d-%H%M%S")) + \
             '_sensor_Vibration.csv'
         f = open(log_file, "x", encoding='utf-8')
         try:
@@ -193,7 +192,7 @@ class client_inputDevice:
                 # generate .csv log file
                 with open(log_file, 'w', newline='', encoding='utf-8') as csv_file:
                     writer = csv.writer(csv_file)
-                    writer.writerow(vibration_state)
+                    writer.writerows(str(vibration_state))
                     csv_file.close()
                 time.sleep(2)  # Wait for a short period before reading again
         except RuntimeError as err:

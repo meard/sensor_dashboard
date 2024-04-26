@@ -65,7 +65,7 @@ let triggers = {
 };
 
 // Live chart elements and configs
-const maxReadings = 100;
+const maxReadings = 10;
 let liveChart;
 const chartCanvasEl = document.getElementById('live-chart');
 
@@ -124,7 +124,7 @@ let optionsObject = {
     yAxes: [{
       ticks: {
         beginAtZero: true,
-        max: 4000
+        max: 100
       }
     }]
   }
