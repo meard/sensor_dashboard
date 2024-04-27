@@ -38,7 +38,7 @@ class client_inputDevice:
     def sensorStatus(self, sensor):
         # Send keep-alive message so dashboard knows we're still connected
         while True:
-            if (self.client.is_connected()):
+            if (sensor):
                 # print("Sensor Status: {}".format(str(self.client.is_connected())))
                 self.client.publish("iothackday/dfe/input-device", "true")
             else:
@@ -161,7 +161,7 @@ class client_inputDevice:
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(vibration_channel, GPIO.IN)
         log_file = 'sensorData/'+str(time.strftime("%Y%m%d-%H%M%S")) + \
-            '_sensor_Vibration.csv'
+            '_sensor_Vibration.json'
         f = open(log_file, "x", encoding='utf-8')
         try:
             # let us know when the pin goes HIGH or LOW
@@ -204,7 +204,7 @@ class client_inputDevice:
                     target=self.vibrationSensor, name="vibration")
 
                 t5 = threading.Thread(
-                    target=self.sensorStatus, name="Sensor Status", args=(True,))
+                    target=self.sensorStatus, name="Sensor Status", args=(self.client.is_connected(),))
 
                 t1.daemon = True
                 t2.daemon = True
