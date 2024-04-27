@@ -19,6 +19,17 @@ import wifi
 import RPi.GPIO as GPIO
 import dht11
 
+# sensor value
+sensorData_Temperature = []
+sensorData_Gas = []
+sensorData_Tilt = []
+sensorData_Vibration = []
+
+# sensor value time
+sensorData_Temperature_time = []
+sensorData_Gas_time = []
+sensorData_Tilt_time = []
+sensorData_Vibration_time = []
 
 class client_inputDevice:
     def __init__(self):
@@ -27,17 +38,17 @@ class client_inputDevice:
         self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
         self.client_server = "test.mosquitto.org"
 
-        # sensor value
-        self.sensorData_Temperature = []
-        self.sensorData_Gas = []
-        self.sensorData_Tilt = []
-        self.sensorData_Vibration = []
+        # # sensor value
+        # self.sensorData_Temperature = []
+        # self.sensorData_Gas = []
+        # self.sensorData_Tilt = []
+        # self.sensorData_Vibration = []
 
-        # sensor value time
-        self.sensorData_Temperature_time = []
-        self.sensorData_Gas_time = []
-        self.sensorData_Tilt_time = []
-        self.sensorData_Vibration_time = []
+        # # sensor value time
+        # self.sensorData_Temperature_time = []
+        # self.sensorData_Gas_time = []
+        # self.sensorData_Tilt_time = []
+        # self.sensorData_Vibration_time = []
 
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
@@ -76,15 +87,15 @@ class client_inputDevice:
                 if result.is_valid():
                     self.client.publish(
                         'iothackday/dfe/input-device/temperatureHumidity', str(result.temperature))
-                    self.sensorData_Temperature.append(str(result.temperature))
-                    self.sensorData_Temperature_time.append(str(time.time()))
+                    sensorData_Temperature.append(str(result.temperature))
+                    sensorData_Temperature_time.append(str(time.time()))
                     print("Current Temp: {}: ".format(str(result.temperature)))
                 # Wait for a short period before reading again
                 time.sleep(2)
         except (RuntimeError, KeyboardInterrupt, SystemExit) as err:
-            self.sensorData = pd.DataFrame(
-                {'Time - Temperature': self.sensorData_Temperature_time, 'Temperature Value': self.sensorData_Temperature})
-            self.sensorData.to_csv(log_file, index=False)
+            # self.sensorData = pd.DataFrame(
+            #     {'Time - Temperature': self.sensorData_Temperature_time, 'Temperature Value': self.sensorData_Temperature})
+            # self.sensorData.to_csv(log_file, index=False)
             print(err.args[0])
         finally:
             # Clean up GPIO settings
@@ -114,13 +125,13 @@ class client_inputDevice:
 
                 self.client.publish(
                     'iothackday/dfe/input-device/gas', str(gas_state))
-                self.sensorData_Gas.append(str(gas_state))
-                self.sensorData_Gas_time.append(str(time.time()))
+                sensorData_Gas.append(str(gas_state))
+                sensorData_Gas_time.append(str(time.time()))
                 time.sleep(2)  # Wait for a short period before reading again
         except (RuntimeError, KeyboardInterrupt, SystemExit) as err:
-            self.sensorData = pd.DataFrame(
-                {'Time - Gas': self.sensorData_Gas, 'Gas Value': self.sensorData_Gas_time})
-            self.sensorData.to_csv(log_file, index=False)
+            # self.sensorData = pd.DataFrame(
+            #     {'Time - Gas': self.sensorData_Gas, 'Gas Value': self.sensorData_Gas_time})
+            # self.sensorData.to_csv(log_file, index=False)
             print(err.args[0])
         finally:
             # Clean up GPIO settings
@@ -146,13 +157,13 @@ class client_inputDevice:
                     tilt_state = 0
                 self.client.publish(
                     'iothackday/dfe/input-device/tilt', str(tilt_state))
-                self.sensorData_Tilt.append(str(tilt_state))
-                self.sensorData_Tilt_time.append(str(time.time()))
+                sensorData_Tilt.append(str(tilt_state))
+                sensorData_Tilt_time.append(str(time.time()))
                 time.sleep(2)  # Wait for a short period before reading again
         except (RuntimeError, KeyboardInterrupt, SystemExit) as err:
-            self.sensorData = pd.DataFrame(
-                {'Time - Tilt': self.sensorData_Tilt, 'Tilt Value': self.sensorData_Tilt_time})
-            self.sensorData.to_csv(log_file, index=False)
+            # self.sensorData = pd.DataFrame(
+            #     {'Time - Tilt': self.sensorData_Tilt, 'Tilt Value': self.sensorData_Tilt_time})
+            # self.sensorData.to_csv(log_file, index=False)
             print(err.args[0])
 
         finally:
@@ -179,13 +190,13 @@ class client_inputDevice:
                     vibration_state = 0
                 self.client.publish(
                     'iothackday/dfe/input-device/vibration', str(vibration_state))
-                self.sensorData_Vibration.append(str(vibration_state))
-                self.sensorData_Vibration_time.append(str(time.time()))
+                sensorData_Vibration.append(str(vibration_state))
+                sensorData_Vibration_time.append(str(time.time()))
                 time.sleep(2)  # Wait for a short period before reading again
         except (RuntimeError, KeyboardInterrupt, SystemExit) as err:
-            self.sensorData = pd.DataFrame(
-                {'Time - Vibration': self.sensorData_Vibration, 'Vibration Value': self.sensorData_Vibration_time})
-            self.sensorData.to_csv(log_file, index=False)
+            # self.sensorData = pd.DataFrame(
+            #     {'Time - Vibration': self.sensorData_Vibration, 'Vibration Value': self.sensorData_Vibration_time})
+            # self.sensorData.to_csv(log_file, index=False)
             print(err.args[0])
         finally:
             # Clean up GPIO settings
@@ -233,17 +244,17 @@ class client_inputDevice:
                 print("[INFO] Generating Log File in CSV format....")
                 log_file = 'sensorData/'+str(time.strftime("%Y%m%d-%H%M%S")) + \
                     '_sensorData.csv'
-                self.sensorData = pd.DataFrame(
-                    {'Time - Temperature': self.sensorData_Temperature_time,
-                     'Temperature Value': self.sensorData_Temperature,
-                     'Time - Gas': self.sensorData_Gas,
-                     'Gas Value': self.sensorData_Gas_time,
-                     'Time - Tilt': self.sensorData_Tilt,
-                     'Tilt Value': self.sensorData_Tilt_time,
-                     'Time - Vibration': self.sensorData_Vibration,
-                     'Vibration Value': self.sensorData_Vibration_time,
+                sensorData = pd.DataFrame(
+                    {'Time - Temperature': sensorData_Temperature_time,
+                     'Temperature Value': sensorData_Temperature,
+                     'Time - Gas': sensorData_Gas,
+                     'Gas Value': sensorData_Gas_time,
+                     'Time - Tilt': sensorData_Tilt,
+                     'Tilt Value': sensorData_Tilt_time,
+                     'Time - Vibration': sensorData_Vibration,
+                     'Vibration Value': sensorData_Vibration_time,
                      })
-                self.sensorData.to_csv(log_file, index=False)
+                sensorData.to_csv(log_file, index=False)
 
             finally:
                 # Stop MQTT server Clean up GPIO settings
@@ -252,7 +263,7 @@ class client_inputDevice:
                 time.sleep(1)
                 GPIO.cleanup()
                 print("[INFO] Cleanup Done. Exiting Now")
-                for i in range(0, 10):
+                for i in range(10):
                     self.client.publish("iothackday/dfe/input-device", "false")
 
                 sys.exit()
