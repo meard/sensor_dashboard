@@ -207,18 +207,36 @@ class client_inputDevice:
         print("[INFO] Generating Log File in CSV format....")
         #log_file = 'sensorData/'+str(time.strftime("%Y%m%d-%H%M%S")) + \
         #    '_sensorData.csv'
-        sensorData = pd.DataFrame(
+        sensorData_Temp = pd.DataFrame(
             {
                 'Time - Temperature':   self.sensorData_Temperature_time,
-                'Temperature Value':    self.sensorData_Temperature,
+                'Temperature Value':    self.sensorData_Temperature
+                })
+        
+        sensorData_Gas = pd.DataFrame(
+            {
                 'Time - Gas':           self.sensorData_Gas,
-                'Gas Value':            self.sensorData_Gas_time,
+                'Gas Value':            self.sensorData_Gas_time
+     
+                })
+        
+        sensorData_Tilt = pd.DataFrame(
+            {
                 'Time - Tilt':          self.sensorData_Tilt,
-                'Tilt Value':           self.sensorData_Tilt_time,
+                'Tilt Value':           self.sensorData_Tilt_time
+                })
+        
+        sensorData_Vibration = pd.DataFrame(
+            {
                 'Time - Vibration':     self.sensorData_Vibration,
                 'Vibration Value':      self.sensorData_Vibration_time,
                 })
-        print("[INFO] sensor Data: ", sensorData)
+        
+        print("[INFO] Sensor Temperature Data: ", sensorData_Temp)
+        print("[INFO] Sensor Gas Data: ", sensorData_Gas)
+        print("[INFO] Sensor Tilt Data: ", sensorData_Tilt)
+        print("[INFO] Sensor Vibration Data: ", sensorData_Vibration)
+        
         #print(sensorData)
                 #sensorData.to_csv(log_file, index=False)
     
@@ -263,7 +281,6 @@ class client_inputDevice:
                 t5.join()
 
             except (KeyboardInterrupt):
-                
                 print("[INFO]Dashboard stopped by User")
 
             finally:
