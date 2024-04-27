@@ -239,11 +239,11 @@ class client_inputDevice:
                 t4.join()
                 t5.join()
 
-            except (KeyboardInterrupt, SystemExit):
+            except (KeyboardInterrupt):
                 print("[INFO]Dashboard stopped by User")
                 print("[INFO] Generating Log File in CSV format....")
-                log_file = 'sensorData/'+str(time.strftime("%Y%m%d-%H%M%S")) + \
-                    '_sensorData.csv'
+                #log_file = 'sensorData/'+str(time.strftime("%Y%m%d-%H%M%S")) + \
+                #    '_sensorData.csv'
                 sensorData = pd.DataFrame(
                     {'Time - Temperature': sensorData_Temperature_time,
                      'Temperature Value': sensorData_Temperature,
@@ -254,7 +254,9 @@ class client_inputDevice:
                      'Time - Vibration': sensorData_Vibration,
                      'Vibration Value': sensorData_Vibration_time,
                      })
-                sensorData.to_csv(log_file, index=False)
+                print("[INFO] sensor Data: ", sensorData)
+                #print(sensorData)
+                #sensorData.to_csv(log_file, index=False)
 
             finally:
                 # Stop MQTT server Clean up GPIO settings
