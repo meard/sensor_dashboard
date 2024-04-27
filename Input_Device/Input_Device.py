@@ -89,7 +89,7 @@ class client_inputDevice:
                         'iothackday/dfe/input-device/temperatureHumidity', str(result.temperature))
                     sensorData_Temperature.append(str(result.temperature))
                     sensorData_Temperature_time.append(str(time.time()))
-                    print("Current Temp: {}: ".format(str(result.temperature)))
+                    print("Current Temp: {}".format(str(result.temperature)))
                 # Wait for a short period before reading again
                 time.sleep(2)
         except (RuntimeError, KeyboardInterrupt, SystemExit) as err:
