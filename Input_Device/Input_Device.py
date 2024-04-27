@@ -8,6 +8,8 @@ import threading
 import datetime
 import string
 import csv
+import pandas as pd
+import json
 
 # user imports
 import paho.mqtt.client as mqtt
@@ -22,6 +24,18 @@ class client_inputDevice:
 
         self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
         self.client_server = "test.mosquitto.org"
+
+        # sensor value
+        self.sensorData_Temperature = []
+        self.sensorData_Gas = []
+        self.sensorData_Tilt = []
+        self.sensorData_Vibration = []
+
+        # sensor value time
+        self.sensorData_Temperature_time = []
+        self.sensorData_Gas_time = []
+        self.sensorData_Tilt_time = []
+        self.sensorData_Vibration_time = []
 
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
@@ -53,25 +67,22 @@ class client_inputDevice:
         dht_channel = dht11.DHT11(pin=17)
         log_file = 'sensorData/'+str(time.strftime("%Y%m%d-%H%M%S")) + \
             '_sensor_Temperature_Humidity.csv'
-        f = open(log_file, "x", encoding='utf-8')
+        # f = open(log_file, "x", encoding='utf-8')
         try:
             while True:
                 result = dht_channel.read()
                 if result.is_valid():
                     self.client.publish(
                         'iothackday/dfe/input-device/temperatureHumidity', str(result.temperature))
-                    # generate .csv log file
-                    with open(log_file, 'w', newline='', encoding='utf-8') as csv_file:
-                        writer = csv.writer(csv_file)
-                        writer.writerows(str(result.temperature))
-                    
-                    print("Temp:{} C".format(str(result.temperature)))
+                    self.sensorData_Temperature.append(str(result.temperature))
+                    self.sensorData_Temperature_Time.append(str(time.time()))
 
-                    csv_file.close()
                 # Wait for a short period before reading again
                 time.sleep(2)
-        except RuntimeError as err:
-            f.close()
+        except (RuntimeError, KeyboardInterrupt, SystemExit) as err:
+            self.sensorData = pd.DataFrame(
+                {'Time - Temperature': self.sensorData_Temperature_Time, 'Temperature Value': self.sensorData_Temperature})
+            self.sensorData.to_csv(log_file, index=False)
             print(err.args[0])
         finally:
             # Clean up GPIO settings
@@ -87,7 +98,7 @@ class client_inputDevice:
         GPIO.setup(gas_channel, GPIO.IN)
         log_file = 'sensorData/'+str(time.strftime("%Y%m%d-%H%M%S")) + \
             '_sensor_Gas.csv'
-        f = open(log_file, "x", encoding='utf-8')
+
         try:
             while True:
                 # Read the state of the DO pin
@@ -101,17 +112,13 @@ class client_inputDevice:
 
                 self.client.publish(
                     'iothackday/dfe/input-device/gas', str(gas_state))
-                # generate .csv log file
-                with open(log_file, 'w', newline='', encoding='utf-8') as csv_file:
-                    writer = csv.writer(csv_file)
-                    writer.writerows(str(gas_state))
-
-                # print("Gas State:{} C".format(str(gas_state)))
-
-                csv_file.close()
+                self.sensorData_Gas.append(str(gas_state))
+                self.sensorData_Gas_time.append(str(time.time()))
                 time.sleep(2)  # Wait for a short period before reading again
-        except RuntimeError as err:
-            f.close()
+        except (RuntimeError, KeyboardInterrupt, SystemExit) as err:
+            self.sensorData = pd.DataFrame(
+                {'Time - Gas': self.sensorData_Gas, 'Gas Value': self.sensorData_Gas_time})
+            self.sensorData.to_csv(log_file, index=False)
             print(err.args[0])
         finally:
             # Clean up GPIO settings
@@ -127,7 +134,6 @@ class client_inputDevice:
         GPIO.setup(tilt_channel, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         log_file = 'sensorData/'+str(time.strftime("%Y%m%d-%H%M%S")) + \
             '_sensor_Tilt.csv'
-        f = open(log_file, "x", encoding='utf-8')
         try:
             GPIO.add_event_detect(tilt_channel, GPIO.FALLING,
                                   bouncetime=100)
@@ -138,16 +144,15 @@ class client_inputDevice:
                     tilt_state = 0
                 self.client.publish(
                     'iothackday/dfe/input-device/tilt', str(tilt_state))
-                # generate .csv log file
-                with open(log_file, 'w', newline='', encoding='utf-8') as csv_file:
-                    writer = csv.writer(csv_file)
-                    writer.writerows(str(tilt_state))
-                # print("Tilt State:{} C".format(str(tilt_state)))
-                csv_file.close()
+                self.sensorData_Tilt.append(str(tilt_state))
+                self.sensorData_Tilt_time.append(str(time.time()))
                 time.sleep(2)  # Wait for a short period before reading again
-        except RuntimeError as err:
-            f.close()
+        except (RuntimeError, KeyboardInterrupt, SystemExit) as err:
+            self.sensorData = pd.DataFrame(
+                {'Time - Tilt': self.sensorData_Tilt, 'Tilt Value': self.sensorData_Tilt_time})
+            self.sensorData.to_csv(log_file, index=False)
             print(err.args[0])
+
         finally:
             # Clean up GPIO settings
             GPIO.cleanup()
@@ -161,8 +166,7 @@ class client_inputDevice:
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(vibration_channel, GPIO.IN)
         log_file = 'sensorData/'+str(time.strftime("%Y%m%d-%H%M%S")) + \
-            '_sensor_Vibration.json'
-        f = open(log_file, "x", encoding='utf-8')
+            '_sensor_Vibration.csv'
         try:
             # let us know when the pin goes HIGH or LOW
             GPIO.add_event_detect(vibration_channel, GPIO.BOTH, bouncetime=300)
@@ -173,15 +177,13 @@ class client_inputDevice:
                     vibration_state = 0
                 self.client.publish(
                     'iothackday/dfe/input-device/vibration', str(vibration_state))
-                # generate .csv log file
-                with open(log_file, 'w', newline='', encoding='utf-8') as csv_file:
-                    writer = csv.writer(csv_file)
-                    writer.writerows(str(vibration_state))
-                    csv_file.close()
-                # print("Tilt State:{} C".format(str(vibration_state)))
+                self.sensorData_Vibration.append(str(vibration_state))
+                self.sensorData_Vibration_time.append(str(time.time()))
                 time.sleep(2)  # Wait for a short period before reading again
-        except RuntimeError as err:
-            f.close()
+        except (RuntimeError, KeyboardInterrupt, SystemExit) as err:
+            self.sensorData = pd.DataFrame(
+                {'Time - Vibration': self.sensorData_Vibration, 'Vibration Value': self.sensorData_Vibration_time})
+            self.sensorData.to_csv(log_file, index=False)
             print(err.args[0])
         finally:
             # Clean up GPIO settings
@@ -236,7 +238,6 @@ class client_inputDevice:
                 print("[INFO] Cleanup Done. Exiting Now")
                 for i in range(0, 10):
                     self.client.publish("iothackday/dfe/input-device", "false")
-                
 
                 sys.exit()
 
