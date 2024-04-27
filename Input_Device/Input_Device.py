@@ -10,6 +10,8 @@ import string
 import csv
 import pandas as pd
 import json
+import time
+import numpy as np
 
 # user imports
 import paho.mqtt.client as mqtt
@@ -60,8 +62,8 @@ class client_inputDevice:
                 self.client.publish("iothackday/dfe/input-device", "false")
 
     def temperatureHumiditySensor(self):
-        print("[INFO] Initializing Temperature Sensor Thread ")
-        time.sleep(3)
+        print("[INFO] Running Temperature Sensor Thread ")
+        time.sleep(2)
 
         # read data using pin 17
         dht_channel = dht11.DHT11(pin=17)
@@ -75,13 +77,13 @@ class client_inputDevice:
                     self.client.publish(
                         'iothackday/dfe/input-device/temperatureHumidity', str(result.temperature))
                     self.sensorData_Temperature.append(str(result.temperature))
-                    self.sensorData_Temperature_Time.append(str(time.time()))
-
+                    self.sensorData_Temperature_time.append(str(time.time()))
+                    print("Current Temp: {}: ".format(str(result.temperature)))
                 # Wait for a short period before reading again
                 time.sleep(2)
         except (RuntimeError, KeyboardInterrupt, SystemExit) as err:
             self.sensorData = pd.DataFrame(
-                {'Time - Temperature': self.sensorData_Temperature_Time, 'Temperature Value': self.sensorData_Temperature})
+                {'Time - Temperature': self.sensorData_Temperature_time, 'Temperature Value': self.sensorData_Temperature})
             self.sensorData.to_csv(log_file, index=False)
             print(err.args[0])
         finally:
@@ -89,8 +91,8 @@ class client_inputDevice:
             GPIO.cleanup()
 
     def gasSensor(self):
-        print("[INFO] Initializing Gas Sensor Thread ")
-        time.sleep(3)
+        print("[INFO] Running Gas Sensor Thread ")
+        time.sleep(1)
 
         gas_channel = 7  # Replace with the actual GPIO pin number
         gas_state = 0
@@ -125,8 +127,8 @@ class client_inputDevice:
             GPIO.cleanup()
 
     def tiltSensor(self):
-        print("[INFO] Initializing Tilt Sensor Thread ")
-        time.sleep(3)
+        print("[INFO] Running Tilt Sensor Thread ")
+        time.sleep(1)
 
         tilt_channel = 21
         tilt_state = 0
@@ -158,8 +160,8 @@ class client_inputDevice:
             GPIO.cleanup()
 
     def vibrationSensor(self):
-        print("[INFO] Initializing Vibration Sensor Thread ")
-        time.sleep(3)
+        print("[INFO] Running Vibration Sensor Thread ")
+        time.sleep(1)
 
         vibration_channel = 22
         vibration_state = 0
@@ -196,7 +198,7 @@ class client_inputDevice:
             try:
                 # Reconnect to MQTT broker if dropped
                 client.loop_start()
-                time.sleep(5)
+                time.sleep(2)
 
                 t1 = threading.Thread(
                     target=self.temperatureHumiditySensor, name="temperatureHumiditySensor")
