@@ -332,7 +332,7 @@ function processMessages(topic, message) {
     case inputDeviceStatusTopic:
       let sensor_status = message;
       let status = new TextDecoder('utf-8').decode(sensor_status);
-      console.log(status);
+      // console.log(status);
       if (status == "true") {
         inputDeviceOnline = !inputDeviceOnline;
         displayDeviceStatus();
@@ -357,10 +357,10 @@ function processMessages(topic, message) {
       let nextValue = message;
 
       // Real MQTT messages are UTF-8 encoded, so we need to decode them
-      if (!mockDataEnabled) {
-        let nextValue = new TextDecoder('utf-8').decode(nextValue);
-      }
-
+      //if (!mockDataEnabled) {
+      //  let nextValue = new TextDecoder('utf-8').decode(nextValue);
+      //}
+      console.log(message)
       // Push next value to appropriate sensor data object
       currentSensorData.labels.push(Date.now());
       currentSensorData.data.push(parseInt(message));
@@ -731,7 +731,7 @@ function checkDevices() {
 
 // Display the current status of each device at the top of the page
 function displayDeviceStatus() {
-  console.log("Input Device Status: "+inputDeviceOnline);
+  // console.log("Input Device Status: "+inputDeviceOnline);
   // Display input device status
   let connectedEl = inputDeviceStatusEl.querySelector('.connected');
   let notConnectedEl = inputDeviceStatusEl.querySelector('.not-connected');

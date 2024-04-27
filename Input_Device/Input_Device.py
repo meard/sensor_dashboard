@@ -39,10 +39,10 @@ class client_inputDevice:
         # Send keep-alive message so dashboard knows we're still connected
         while True:
             if (self.client.is_connected()):
-                print("Sensor Status: {}".format(str(self.client.is_connected())))
+                # print("Sensor Status: {}".format(str(self.client.is_connected())))
                 self.client.publish("iothackday/dfe/input-device", "true")
             else:
-                print("Sensor Status: {}".format(str(self.client.is_connected())))
+                # print("Sensor Status: {}".format(str(self.client.is_connected())))
                 self.client.publish("iothackday/dfe/input-device", "false")
 
     def temperatureHumiditySensor(self):
@@ -65,7 +65,7 @@ class client_inputDevice:
                         writer = csv.writer(csv_file)
                         writer.writerows(str(result.temperature))
                     
-                    # print("Temp:{} C".format(str(result.temperature)))
+                    print("Temp:{} C".format(str(result.temperature)))
 
                     csv_file.close()
                 # Wait for a short period before reading again
