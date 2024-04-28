@@ -1,6 +1,7 @@
 import RPi.GPIO as GPIO
 import time
 import json
+import board
 
 # GPIO SETUP
 channel = 22

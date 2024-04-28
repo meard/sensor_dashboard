@@ -111,8 +111,8 @@ let vibrationData = {
 
 let currentSensorData = temperatureHumidityData;
 
-// Live chart configuration
-let optionsObject = {
+// Live chart configuration - optionsObject
+let options1Object = {
   events: [], // disables tooltips on data points
   xAxisID: "Values",
   yAxisID: "Timestamp",
@@ -132,7 +132,35 @@ let optionsObject = {
       {
         ticks: {
           beginAtZero: true,
-          max: 100,
+          max: 50,
+        },
+      },
+    ],
+  },
+};
+
+// Live chart configuration
+let options2Object = {
+  events: [], // disables tooltips on data points
+  xAxisID: "Values",
+  yAxisID: "Timestamp",
+  legend: {
+    display: false,
+  },
+  animation: false,
+  scales: {
+    xAxes: [
+      {
+        ticks: {
+          display: false,
+        },
+      },
+    ],
+    yAxes: [
+      {
+        ticks: {
+          beginAtZero: true,
+          max: 2,
         },
       },
     ],
@@ -162,9 +190,9 @@ window.addEventListener("DOMContentLoaded", function (e) {
   liveChart = new Chart(chartCanvasEl, {
     type: "line",
     data: dataObject,
-    options: optionsObject,
+    options: options1Object,
   });
-  
+
   console.log("Default Sensor: " + currentSensor);
   // Periodically check input/output devices for keep-alive messages
   // setInterval(checkDevices, 3000);
@@ -180,7 +208,7 @@ window.addEventListener("DOMContentLoaded", function (e) {
     currentSensor = e.target.value || "temperature";
 
     console.log(currentSensor);
-    
+
     switch (currentSensor) {
       case "temperature":
         currentSensorData = temperatureHumidityData;
@@ -353,110 +381,141 @@ function processMessages(topic, message) {
         inputDeviceOnline = false;
         displayDeviceStatus();
       }
-
-      // if (!inputDeviceOnline) {
-      //   inputDeviceOnline = true;
-      //   displayDeviceStatus();
-      // }
-
       break;
 
     // Sensor device has sent sensor data
     case inputDeviceTemperatureHumiditySensorTopic:
-    case inputDeviceGasSensorTopic:
-    case inputDeviceTiltSensorTopic:
-    case inputDeviceVibrationSensorTopic:
-      let nextValue = message;
-
-      // Real MQTT messages are UTF-8 encoded, so we need to decode them
-      if (!mockDataEnabled) {
-        let nextValue = new TextDecoder("utf-8").decode(nextValue);
+      if (currentSensor == "temperture") {
+        generateGraphComponent(message);
       }
-
-      // Push next value to appropriate sensor data object
-      currentSensorData.labels.push(Date.now());
-      currentSensorData.data.push(parseFloat(message));
-
-      // Remove first data point when we have too many
-      if (currentSensorData.labels.length >= maxReadings) {
-        currentSensorData.labels.shift();
-        currentSensorData.data.shift();
-      }
-
-      // Inject current sensor data into chart data object
-      dataObject.labels = currentSensorData.labels;
-      dataObject.datasets[0].data = currentSensorData.data;
-
-      // Only refresh the UI at the interval requested by the user
-      if (Date.now() > lastDisplayUpdate + displayInterval && !isPaused) {
-        // Re-initialize chart to display new data
-        liveChart = new Chart(chartCanvasEl, {
-          type: "line",
-          data: dataObject,
-          options: optionsObject,
-        });
-
-        // Create new row in visually-hidden data table
-        let row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${nextValue}</td>
-          <td>${new Date()}</td>
-        `;
-
-        let tbody = document.querySelector("#sensor-data tbody");
-        let firstRow = tbody.querySelector("tr");
-
-        // Insert new row into the data table
-        if (firstRow == undefined) {
-          tbody.append(row);
-        } else {
-          tbody.insertBefore(row, firstRow);
-        }
-
-        // Remove oldest sensor reading when maximum threshold reached
-        if (tbody.children.length >= maxReadings) {
-          tbody.children[tbody.children.length - 1].remove();
-        }
-
-        // Display this new sensor value on the "last reading" highlight block
-        displaySensorReading();
-
-        // Update last display refresh timestamp
-        lastDisplayUpdate = Date.now();
-      }
-
-      // Add to total reading count for this sensor
-      switch (currentSensor) {
-        case "temperature":
-          totalReadings.temperatureHumidity++;
-          break;
-
-        case "gas":
-          totalReadings.gas++;
-          break;
-
-        case "tilt":
-          totalReadings.tilt++;
-          break;
-
-        case "vibration":
-          totalReadings.vibration++;
-          break;
-      }
-
-      displayTotalReadings();
-
       break;
 
-    // Output device has sent keep-alive message
-    case outputDeviceStatusTopic:
-      if (!outputDeviceOnline) {
-        outputDeviceOnline = true;
-        displayDeviceStatus();
+    case inputDeviceGasSensorTopic:
+      if (currentSensor == "gas") {
+        generateGraphComponent(message);
       }
+      break;
 
+    case inputDeviceTiltSensorTopic:
+      if (currentSensor == "tilt") {
+        generateGraphComponent(message);
+      }
+      break;
+
+    case inputDeviceVibrationSensorTopic:
+      if (currentSensor == "vibration") {
+        generateGraphComponent(message);
+      }
       break;
   }
+}
+
+// Generate sensor graph for individual sensors
+function generateGraphComponent(message) {
+  if (currentSensor == "temperature") {
+    // Re-initialize chart to display new data
+    liveChart = new Chart(chartCanvasEl, {
+      type: "line",
+      data: dataObject,
+      options: options1Object,
+    });
+  } else {
+    // Re-initialize chart to display new data
+    liveChart = new Chart(chartCanvasEl, {
+      type: "line",
+      data: dataObject,
+      options: options2Object,
+    });
+  }
+
+  let nextValue = message;
+
+  // Real MQTT messages are UTF-8 encoded, so we need to decode them
+  if (!mockDataEnabled) {
+    let nextValue = new TextDecoder("utf-8").decode(nextValue);
+  }
+
+  // Push next value to appropriate sensor data object
+  currentSensorData.labels.push(Date.now());
+  currentSensorData.data.push(parseFloat(message));
+
+  // Remove first data point when we have too many
+  if (currentSensorData.labels.length >= maxReadings) {
+    currentSensorData.labels.shift();
+    currentSensorData.data.shift();
+  }
+
+  // Inject current sensor data into chart data object
+  dataObject.labels = currentSensorData.labels;
+  dataObject.datasets[0].data = currentSensorData.data;
+
+  // Only refresh the UI at the interval requested by the user
+  if (Date.now() > lastDisplayUpdate + displayInterval && !isPaused) {
+    if (currentSensor == "temperature") {
+      // Re-initialize chart to display new data
+      liveChart = new Chart(chartCanvasEl, {
+        type: "line",
+        data: dataObject,
+        options: options1Object,
+      });
+    } else {
+      // Re-initialize chart to display new data
+      liveChart = new Chart(chartCanvasEl, {
+        type: "line",
+        data: dataObject,
+        options: options2Object,
+      });
+    }
+
+    // Create new row in visually-hidden data table
+    let row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${nextValue}</td>
+      <td>${new Date()}</td>
+    `;
+
+    let tbody = document.querySelector("#sensor-data tbody");
+    let firstRow = tbody.querySelector("tr");
+
+    // Insert new row into the data table
+    if (firstRow == undefined) {
+      tbody.append(row);
+    } else {
+      tbody.insertBefore(row, firstRow);
+    }
+
+    // Remove oldest sensor reading when maximum threshold reached
+    if (tbody.children.length >= maxReadings) {
+      tbody.children[tbody.children.length - 1].remove();
+    }
+
+    // Display this new sensor value on the "last reading" highlight block
+    displaySensorReading();
+
+    // Update last display refresh timestamp
+    lastDisplayUpdate = Date.now();
+  }
+
+  // Add to total reading count for this sensor
+  switch (currentSensor) {
+    case "temperature":
+      totalReadings.temperatureHumidity++;
+      break;
+
+    case "gas":
+      totalReadings.gas++;
+      break;
+
+    case "tilt":
+      totalReadings.tilt++;
+      break;
+
+    case "vibration":
+      totalReadings.vibration++;
+      break;
+  }
+
+  displayTotalReadings();
 }
 
 //================================================================
