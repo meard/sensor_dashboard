@@ -206,7 +206,7 @@ class client_inputDevice:
     def generate_log_within_class(self):
         try:
             print("[INFO] Generating Log File in CSV format....")
-            
+
             log_file_1 = 'sensorData/'+str(time.strftime("%Y%m%d-%H%M%S")) + \
                 '_sensor_Temperature_Humidity.csv'
             sensorData_Temp = pd.DataFrame(
@@ -243,7 +243,7 @@ class client_inputDevice:
                     'Vibration Value':      self.sensorData_Vibration_time,
                 })
             sensorData_Vibration.to_csv(log_file_4, index=False)
-        
+
         except Exception as e:
             print("[ERROR] Log File generation Failed.")
             print(e)

@@ -1,9 +1,9 @@
 // Packages
-let mqtt = require('mqtt')
-let charts = require('chart.js');
+let mqtt = require("mqtt");
+let charts = require("chart.js");
 
 // MQTT setup
-let client = mqtt.connect('wss://test.mosquitto.org:8081');
+let client = mqtt.connect("wss://test.mosquitto.org:8081");
 
 // Pause control for data collection
 let isPaused = false;
@@ -13,17 +13,18 @@ let displayInterval = 100;
 let lastDisplayUpdate = Date.now();
 
 // MQTT topics
-const inputDeviceStatusTopic = 'iothackday/dfe/input-device';
-const outputDeviceStatusTopic = 'iothackday/dfe/output-device';
+const inputDeviceStatusTopic = "iothackday/dfe/input-device";
+const outputDeviceStatusTopic = "iothackday/dfe/output-device";
 
 // const inputDeviceDistanceSensorTopic = 'iothackday/dfe/input-device/distance';
 // const inputDeviceTemperatureSensorTopic = 'iothackday/dfe/input-device/temperature';
 // const inputDeviceLightSensorTopic = 'iothackday/dfe/input-device/light';
 
-const inputDeviceTemperatureHumiditySensorTopic = 'iothackday/dfe/input-device/temperatureHumidity';
-const inputDeviceGasSensorTopic = 'iothackday/dfe/input-device/gas';
-const inputDeviceTiltSensorTopic = 'iothackday/dfe/input-device/tilt';
-const inputDeviceVibrationSensorTopic = 'iothackday/dfe/input-device/vibration';
+const inputDeviceTemperatureHumiditySensorTopic =
+  "iothackday/dfe/input-device/temperatureHumidity";
+const inputDeviceGasSensorTopic = "iothackday/dfe/input-device/gas";
+const inputDeviceTiltSensorTopic = "iothackday/dfe/input-device/tilt";
+const inputDeviceVibrationSensorTopic = "iothackday/dfe/input-device/vibration";
 
 // Device status flags
 let inputDeviceOnline = false;
@@ -39,11 +40,13 @@ let outputLastPing = Date.now();
 let keepAliveThreshold = 1000;
 
 // Important DOM elements
-let inputSensorSelectedEl = document.getElementById('selected-sensor');
-let pauseButtonEl = document.querySelector('#flow-controls .flow-control-button');
-let displayIntervalEl = document.getElementById('interval-selector');
-let inputDeviceStatusEl = document.getElementById('input-device-status');
-let outputDeviceStatusEl = document.getElementById('output-device-status');
+let inputSensorSelectedEl = document.getElementById("selected-sensor");
+let pauseButtonEl = document.querySelector(
+  "#flow-controls .flow-control-button"
+);
+let displayIntervalEl = document.getElementById("interval-selector");
+let inputDeviceStatusEl = document.getElementById("input-device-status");
+let outputDeviceStatusEl = document.getElementById("output-device-status");
 
 // Current sensor
 let currentSensor = inputSensorSelectedEl.value;
@@ -53,7 +56,7 @@ let totalReadings = {
   temperatureHumidity: 0,
   gas: 0,
   tilt: 0,
-  vibration: 0
+  vibration: 0,
 };
 
 // Triggers
@@ -61,47 +64,49 @@ let triggers = {
   temperatureHumidity: [],
   gas: [],
   tilt: [],
-  vibration: []
+  vibration: [],
 };
 
 // Live chart elements and configs
 const maxReadings = 10;
 let liveChart;
-const chartCanvasEl = document.getElementById('live-chart');
+const chartCanvasEl = document.getElementById("live-chart");
 
 // Base data object for live chart
 let dataObject = {
   labels: [],
-  datasets: [{
-    label: 'Sensor values',
-    data: [],
-    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-    borderColor: 'rgba(255, 99, 132, 1)',
-    borderWidth: 1,
-    pointRadius: 0
-  }]
+  datasets: [
+    {
+      label: "Sensor values",
+      data: [],
+      backgroundColor: "rgba(255, 99, 132, 0.2)",
+      borderColor: "rgba(255, 99, 132, 1)",
+      borderWidth: 1,
+      pointRadius: 0,
+    },
+  ],
 };
 
 // Sensor-specific objects that hold sensor readings even when different sensors are active
 let temperatureHumidityData = {
   labels: [],
-  data: []
+  data: [],
   // data2H: []
 };
 
 let gasData = {
   labels: [],
-  data: []
+  data: [],
 };
 
 let tiltData = {
   labels: [],
-  data: []
+  data: [],
 };
 
 let vibrationData = {
   labels: [],
-  data: []
+  data: [],
 };
 
 let currentSensorData = temperatureHumidityData;
@@ -109,25 +114,29 @@ let currentSensorData = temperatureHumidityData;
 // Live chart configuration
 let optionsObject = {
   events: [], // disables tooltips on data points
-  xAxisID: 'Values',
-  yAxisID: 'Timestamp',
+  xAxisID: "Values",
+  yAxisID: "Timestamp",
   legend: {
-    display: false
+    display: false,
   },
   animation: false,
   scales: {
-    xAxes: [{
-      ticks: {
-        display: false
-      }
-    }],
-    yAxes: [{
-      ticks: {
-        beginAtZero: true,
-        max: 100
-      }
-    }]
-  }
+    xAxes: [
+      {
+        ticks: {
+          display: false,
+        },
+      },
+    ],
+    yAxes: [
+      {
+        ticks: {
+          beginAtZero: true,
+          max: 100,
+        },
+      },
+    ],
+  },
 };
 
 // Mock data generation
@@ -145,50 +154,50 @@ function setMockDataTarget() {
   mockDataInterval = setInterval(setMockDataTarget, getRandomInt(1000, 5000));
 }
 
-
 //================================================
 //  Main program setup
 //================================================
-window.addEventListener('DOMContentLoaded', function (e) {
+window.addEventListener("DOMContentLoaded", function (e) {
   // Initialize live chart
   liveChart = new Chart(chartCanvasEl, {
-    type: 'line',
+    type: "line",
     data: dataObject,
-    options: optionsObject
+    options: optionsObject,
   });
 
   // Periodically check input/output devices for keep-alive messages
   // setInterval(checkDevices, 3000);
 
   // Add a new trigger when "Add Trigger" button is clicked
-  let addTriggerButton = document.querySelector('#add-trigger-panel button[type="submit"]');
-  addTriggerButton.addEventListener('click', addNewTrigger);
+  let addTriggerButton = document.querySelector(
+    '#add-trigger-panel button[type="submit"]'
+  );
+  addTriggerButton.addEventListener("click", addNewTrigger);
 
   // Switch data streams when sensor selection is changed
-  inputSensorSelectedEl.addEventListener('change', function (e) {
+  inputSensorSelectedEl.addEventListener("change", function (e) {
     currentSensor = e.target.value;
 
     switch (currentSensor) {
-      case 'temperature':
+      case "temperature":
         currentSensorData = temperatureHumidityData;
         resetDataTable();
         break;
 
-      case 'gas':
+      case "gas":
         currentSensorData = gasData;
         resetDataTable();
         break;
 
-      case 'tilt':
+      case "tilt":
         currentSensorData = tiltData;
         resetDataTable();
         break;
 
-      case 'vibration':
+      case "vibration":
         currentSensorData = vibrationData;
         resetDataTable();
         break;
-
     }
 
     displayTriggers();
@@ -196,29 +205,29 @@ window.addEventListener('DOMContentLoaded', function (e) {
   });
 
   // Toggle pause state of data display when pause/resume button is activated
-  pauseButtonEl.addEventListener('click', function (e) {
+  pauseButtonEl.addEventListener("click", function (e) {
     isPaused = !isPaused;
 
-    let pauseContents = pauseButtonEl.querySelector('.pause-contents');
-    let resumeContents = pauseButtonEl.querySelector('.resume-contents');
+    let pauseContents = pauseButtonEl.querySelector(".pause-contents");
+    let resumeContents = pauseButtonEl.querySelector(".resume-contents");
 
     if (!isPaused) {
-      pauseContents.classList.remove('is-hidden');
-      resumeContents.classList.add('is-hidden');
+      pauseContents.classList.remove("is-hidden");
+      resumeContents.classList.add("is-hidden");
     } else {
-      pauseContents.classList.add('is-hidden');
-      resumeContents.classList.remove('is-hidden');
+      pauseContents.classList.add("is-hidden");
+      resumeContents.classList.remove("is-hidden");
     }
   });
 
   // Update global display interval value when select element is changed
-  displayIntervalEl.addEventListener('change', function (e) {
+  displayIntervalEl.addEventListener("change", function (e) {
     displayInterval = parseInt(e.target.value);
   });
 
   // Toggle mock data using 'Space'
-  document.body.addEventListener('keydown', function (e) {
-    if (e.key === ' ') {
+  document.body.addEventListener("keydown", function (e) {
+    if (e.key === " ") {
       e.preventDefault();
       isPaused = !isPaused;
     }
@@ -227,7 +236,6 @@ window.addEventListener('DOMContentLoaded', function (e) {
   // Render any pre-defined triggers, or just placeholders if there are none
   displayTriggers();
 });
-
 
 // //==========================
 // //  Mock data creation
@@ -294,13 +302,12 @@ window.addEventListener('DOMContentLoaded', function (e) {
 //   }
 // }
 
-
 //=======================================
 //  Set up and manage MQTT connection
 //=======================================
 if (!mockDataEnabled) {
-  client.on('connect', () => {
-    console.log('Connected to MQTT server ...');
+  client.on("connect", () => {
+    console.log("Connected to MQTT server ...");
 
     // Listen for device status messages
     client.subscribe(inputDeviceStatusTopic);
@@ -312,14 +319,12 @@ if (!mockDataEnabled) {
     client.subscribe(inputDeviceTiltSensorTopic);
     client.subscribe(inputDeviceVibrationSensorTopic);
 
-
     // Process messages when they arrive through any of the subscribed topics
-    client.on('message', (topic, message) => {
+    client.on("message", (topic, message) => {
       processMessages(topic, message);
     });
   });
 }
-
 
 //==========================================================
 //  Process data messages coming from live input device
@@ -331,13 +336,12 @@ function processMessages(topic, message) {
     // Input device has sent keep-alive message
     case inputDeviceStatusTopic:
       let sensor_status = message;
-      let status = new TextDecoder('utf-8').decode(sensor_status);
+      let status = new TextDecoder("utf-8").decode(sensor_status);
       // console.log(status);
       if (status == "true") {
         inputDeviceOnline = !inputDeviceOnline;
         displayDeviceStatus();
-      }
-      else if (status == "false"){
+      } else if (status == "false") {
         inputDeviceOnline = !inputDeviceOnline;
         displayDeviceStatus();
       }
@@ -351,6 +355,7 @@ function processMessages(topic, message) {
 
     // Sensor device has sent sensor data
     case inputDeviceTemperatureHumiditySensorTopic:
+      console.log(message);
     case inputDeviceGasSensorTopic:
     case inputDeviceTiltSensorTopic:
     case inputDeviceVibrationSensorTopic:
@@ -360,7 +365,7 @@ function processMessages(topic, message) {
       //if (!mockDataEnabled) {
       //  let nextValue = new TextDecoder('utf-8').decode(nextValue);
       //}
-      console.log(message)
+
       // Push next value to appropriate sensor data object
       currentSensorData.labels.push(Date.now());
       currentSensorData.data.push(parseInt(message));
@@ -377,23 +382,22 @@ function processMessages(topic, message) {
 
       // Only refresh the UI at the interval requested by the user
       if (Date.now() > lastDisplayUpdate + displayInterval && !isPaused) {
-
         // Re-initialize chart to display new data
         liveChart = new Chart(chartCanvasEl, {
-          type: 'line',
+          type: "line",
           data: dataObject,
-          options: optionsObject
+          options: optionsObject,
         });
 
         // Create new row in visually-hidden data table
-        let row = document.createElement('tr');
+        let row = document.createElement("tr");
         row.innerHTML = `
           <td>${nextValue}</td>
           <td>${new Date()}</td>
         `;
 
-        let tbody = document.querySelector('#sensor-data tbody');
-        let firstRow = tbody.querySelector('tr');
+        let tbody = document.querySelector("#sensor-data tbody");
+        let firstRow = tbody.querySelector("tr");
 
         // Insert new row into the data table
         if (firstRow == undefined) {
@@ -416,19 +420,19 @@ function processMessages(topic, message) {
 
       // Add to total reading count for this sensor
       switch (currentSensor) {
-        case 'temperature':
+        case "temperature":
           totalReadings.temperatureHumidity++;
           break;
 
-        case 'gas':
+        case "gas":
           totalReadings.gas++;
           break;
 
-        case 'tilt':
+        case "tilt":
           totalReadings.tilt++;
           break;
 
-        case 'vibration':
+        case "vibration":
           totalReadings.vibration++;
           break;
       }
@@ -448,15 +452,14 @@ function processMessages(topic, message) {
   }
 }
 
-
 //================================================================
 //  Remove all rows from hidden data table for chart, and add
 //  all previous sensor readings for the current sensor.
 //  Called when user selects a new sensor from dropdown.
 //================================================================
 function resetDataTable() {
-  let tbody = document.querySelector('#sensor-data tbody');
-  let oldRows = tbody.querySelectorAll('tr');
+  let tbody = document.querySelector("#sensor-data tbody");
+  let oldRows = tbody.querySelectorAll("tr");
 
   // Remove all the old readings from previous sensor
   oldRows.forEach((row) => {
@@ -465,7 +468,7 @@ function resetDataTable() {
 
   // Add all the previous sensor readings from the current sensor
   for (let i = currentSensorData.data.length - 1; i >= 0; i--) {
-    let row = document.createElement('tr');
+    let row = document.createElement("tr");
     row.innerHTML = `
       <td>${currentSensorData.data[i]}</td>
       <td>${currentSensorData.labels[i]}</td>
@@ -473,7 +476,6 @@ function resetDataTable() {
     tbody.appendChild(row);
   }
 }
-
 
 //======================================================
 //  Display live data in the "highlight" blocks next
@@ -484,46 +486,45 @@ function displayTriggerCount() {
   let currentTriggers;
 
   switch (currentSensor) {
-    case 'temperature':
+    case "temperature":
       currentTriggers = triggers.temperatureHumidity;
       break;
 
-    case 'gas':
+    case "gas":
       currentTriggers = triggers.gas;
       break;
 
-    case 'tilt':
+    case "tilt":
       currentTriggers = triggers.tilt;
       break;
 
-    case 'vibration':
+    case "vibration":
       currentTriggers = triggers.vibration;
       break;
-      
   }
 
-  let triggerCountEl = document.querySelector('#triggers-set-up .value');
+  let triggerCountEl = document.querySelector("#triggers-set-up .value");
   triggerCountEl.innerHTML = currentTriggers.length;
 }
 
 // Display the total number of readings taken for this sensor so far
 function displayTotalReadings() {
-  let readingsSoFarEl = document.querySelector('#readings-so-far .value');
+  let readingsSoFarEl = document.querySelector("#readings-so-far .value");
 
   switch (currentSensor) {
-    case 'temperature':
+    case "temperature":
       readingsSoFarEl.innerHTML = totalReadings.temperatureHumidity;
       break;
 
-    case 'gas':
+    case "gas":
       readingsSoFarEl.innerHTML = totalReadings.gas;
       break;
 
-    case 'tilt':
+    case "tilt":
       readingsSoFarEl.innerHTML = totalReadings.tilt;
       break;
 
-    case 'vibration':
+    case "vibration":
       readingsSoFarEl.innerHTML = totalReadings.vibration;
       break;
   }
@@ -531,10 +532,10 @@ function displayTotalReadings() {
 
 // Display the most recent sensor reading
 function displaySensorReading() {
-  let sensorReadingEl = document.querySelector('#last-reading .value');
-  sensorReadingEl.innerHTML = currentSensorData.data[currentSensorData.data.length - 1];
+  let sensorReadingEl = document.querySelector("#last-reading .value");
+  sensorReadingEl.innerHTML =
+    currentSensorData.data[currentSensorData.data.length - 1];
 }
-
 
 //===============
 //  Triggers
@@ -546,41 +547,51 @@ function addNewTrigger(e) {
   let currentTriggers;
 
   switch (currentSensor) {
-    case 'temperature':
+    case "temperature":
       currentTriggers = triggers.temperatureHumidity;
       break;
 
-    case 'gas':
+    case "gas":
       currentTriggers = triggers.gas;
       break;
 
-    case 'tilt':
+    case "tilt":
       currentTriggers = triggers.tilt;
       break;
 
-    case 'vibration':
+    case "vibration":
       currentTriggers = triggers.vibration;
       break;
   }
 
   if (currentTriggers.length < 3) {
-    let aboveOrBelowEl = document.querySelector('#add-trigger-panel input[name="above-below"]:checked');
-    let thresholdEl = document.querySelector('#add-trigger-panel input[name="threshold-value"]');
-    let motorActionEl = document.querySelector('#add-trigger-panel input[name="motor-action"]:checked');
+    let aboveOrBelowEl = document.querySelector(
+      '#add-trigger-panel input[name="above-below"]:checked'
+    );
+    let thresholdEl = document.querySelector(
+      '#add-trigger-panel input[name="threshold-value"]'
+    );
+    let motorActionEl = document.querySelector(
+      '#add-trigger-panel input[name="motor-action"]:checked'
+    );
 
     // For demo purposes, forget about form validation and just make sure the values aren't null
-    let aboveOrBelow = aboveOrBelowEl != undefined ? aboveOrBelowEl.value : 'above';
-    let threshold = thresholdEl.value != '' ? parseInt(thresholdEl.value) : 500;
-    let motorAction = motorActionEl != undefined ? motorActionEl.value : 'pulse-once';
+    let aboveOrBelow =
+      aboveOrBelowEl != undefined ? aboveOrBelowEl.value : "above";
+    let threshold = thresholdEl.value != "" ? parseInt(thresholdEl.value) : 500;
+    let motorAction =
+      motorActionEl != undefined ? motorActionEl.value : "pulse-once";
 
     // Create a new trigger for this sensor from the form data
-    let newTriggerEl = document.createElement('div');
-    newTriggerEl.classList = 'panel trigger is-blue';
-    newTriggerEl.setAttribute('role', 'group');
+    let newTriggerEl = document.createElement("div");
+    newTriggerEl.classList = "panel trigger is-blue";
+    newTriggerEl.setAttribute("role", "group");
 
     newTriggerEl.innerHTML = `
       <h2>
-        ${currentSensor.charAt(0).toUpperCase() + currentSensor.slice(1)} Trigger #${currentTriggers.length + 1}
+        ${
+          currentSensor.charAt(0).toUpperCase() + currentSensor.slice(1)
+        } Trigger #${currentTriggers.length + 1}
       </h2>
 
       <button class="remove-icon-button remove-button">
@@ -595,7 +606,7 @@ function addNewTrigger(e) {
 
       <div class="action">
         Will
-        <span class="is-highlighted">${motorAction.replace(/-/g, ' ')}</span>
+        <span class="is-highlighted">${motorAction.replace(/-/g, " ")}</span>
         when the
         <span class="is-highlighted">${currentSensor}</span>
         sensor goes
@@ -609,7 +620,7 @@ function addNewTrigger(e) {
     currentTriggers.push(newTriggerEl);
 
     // Announce addition of new trigger to screen reader users
-    announce('Added ' + currentSensor + ' trigger #' + currentTriggers.length);
+    announce("Added " + currentSensor + " trigger #" + currentTriggers.length);
 
     // Update UI
     displayTriggers();
@@ -621,25 +632,30 @@ function removeTrigger(trigger) {
   let currentTriggers;
 
   switch (currentSensor) {
-    case 'temperature':
+    case "temperature":
       currentTriggers = triggers.temperatureHumidity;
       break;
 
-    case 'gas':
+    case "gas":
       currentTriggers = triggers.gas;
       break;
 
-    case 'tilt':
+    case "tilt":
       currentTriggers = triggers.tilt;
       break;
-    
-    case 'vibration':
+
+    case "vibration":
       currentTriggers = triggers.vibration;
       break;
   }
 
   // Announce removal of this trigger to scree reader users, before the trigger is gone
-  announce('Removed ' + currentSensor + ' trigger #' + (currentTriggers.indexOf(trigger) + 1));
+  announce(
+    "Removed " +
+      currentSensor +
+      " trigger #" +
+      (currentTriggers.indexOf(trigger) + 1)
+  );
 
   // Remove this trigger from the array of triggers
   currentTriggers = currentTriggers.splice(currentTriggers.indexOf(trigger), 1);
@@ -656,39 +672,39 @@ function displayTriggers() {
   let currentTriggers;
 
   switch (currentSensor) {
-    case 'temperature':
+    case "temperature":
       currentTriggers = triggers.temperatureHumidity;
       break;
 
-    case 'gas':
+    case "gas":
       currentTriggers = triggers.gas;
       break;
 
-    case 'tilt':
+    case "tilt":
       currentTriggers = triggers.tilt;
       break;
 
-    case 'vibration':
+    case "vibration":
       currentTriggers = triggers.vibration;
       break;
   }
 
-  let columns = document.querySelectorAll('#current-triggers .column');
+  let columns = document.querySelectorAll("#current-triggers .column");
 
   // Display all the current triggers for this sensor
   currentTriggers.forEach(function (trigger, index) {
-    columns[index].innerHTML = '';
+    columns[index].innerHTML = "";
     columns[index].appendChild(trigger);
 
-    let removeButtons = trigger.querySelectorAll('.remove-button');
+    let removeButtons = trigger.querySelectorAll(".remove-button");
     removeButtons.forEach((removeButton) => {
-      if (removeButton.getAttribute('data-has-click-handler')) {
-        removeButton.removeEventListener('click', removeButtonClickHandler);
-        removeButton.removeAttribute('data-has-click-handler');
+      if (removeButton.getAttribute("data-has-click-handler")) {
+        removeButton.removeEventListener("click", removeButtonClickHandler);
+        removeButton.removeAttribute("data-has-click-handler");
       }
 
-      removeButton.addEventListener('click', removeButtonClickHandler);
-      removeButton.setAttribute('data-has-click-handler', true);
+      removeButton.addEventListener("click", removeButtonClickHandler);
+      removeButton.setAttribute("data-has-click-handler", true);
     });
   });
 
@@ -706,9 +722,8 @@ function displayTriggers() {
 
 // Click handler function for remove buttons on each trigger card
 function removeButtonClickHandler(e) {
-  removeTrigger(e.target.closest('.trigger'));
+  removeTrigger(e.target.closest(".trigger"));
 }
-
 
 //==========================================
 //  Device status checking and display
@@ -733,30 +748,29 @@ function checkDevices() {
 function displayDeviceStatus() {
   // console.log("Input Device Status: "+inputDeviceOnline);
   // Display input device status
-  let connectedEl = inputDeviceStatusEl.querySelector('.connected');
-  let notConnectedEl = inputDeviceStatusEl.querySelector('.not-connected');
+  let connectedEl = inputDeviceStatusEl.querySelector(".connected");
+  let notConnectedEl = inputDeviceStatusEl.querySelector(".not-connected");
 
   if (inputDeviceOnline) {
-    connectedEl.classList.add('is-visible');
-    notConnectedEl.classList.remove('is-visible');
+    connectedEl.classList.add("is-visible");
+    notConnectedEl.classList.remove("is-visible");
   } else {
-    connectedEl.classList.remove('is-visible');
-    notConnectedEl.classList.add('is-visible');
+    connectedEl.classList.remove("is-visible");
+    notConnectedEl.classList.add("is-visible");
   }
 
   // Display output device status
-  connectedEl = outputDeviceStatusEl.querySelector('.connected');
-  notConnectedEl = outputDeviceStatusEl.querySelector('.not-connected');
+  connectedEl = outputDeviceStatusEl.querySelector(".connected");
+  notConnectedEl = outputDeviceStatusEl.querySelector(".not-connected");
 
   if (outputDeviceOnline) {
-    connectedEl.classList.add('is-visible');
-    notConnectedEl.classList.remove('is-visible');
+    connectedEl.classList.add("is-visible");
+    notConnectedEl.classList.remove("is-visible");
   } else {
-    connectedEl.classList.remove('is-visible');
-    notConnectedEl.classList.add('is-visible');
+    connectedEl.classList.remove("is-visible");
+    notConnectedEl.classList.add("is-visible");
   }
 }
-
 
 //==================
 //  Utilities
@@ -770,6 +784,6 @@ function getRandomInt(min, max) {
 
 // Insert a message into the assertive live region used for making announcements to screen readers
 function announce(message) {
-  let announcementEl = document.getElementById('screen-reader-announcements');
+  let announcementEl = document.getElementById("screen-reader-announcements");
   announcementEl.innerText = message;
 }
