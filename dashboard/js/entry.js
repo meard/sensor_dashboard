@@ -49,8 +49,8 @@ let inputDeviceStatusEl = document.getElementById("input-device-status");
 let outputDeviceStatusEl = document.getElementById("output-device-status");
 
 // Current sensor
-// let currentSensor = inputSensorSelectedEl.value;
-let currentSensor = "temperature";
+let currentSensor = inputSensorSelectedEl.value;
+let default_currentSensor = "temperature";
 
 // Sensor data
 let totalReadings = {
@@ -178,6 +178,8 @@ window.addEventListener("DOMContentLoaded", function (e) {
   inputSensorSelectedEl.addEventListener("change", function (e) {
     currentSensor = e.target.value;
 
+    console.log(currentSensor);
+    
     switch (currentSensor) {
       case "temperature":
         currentSensorData = temperatureHumidityData;
@@ -366,9 +368,9 @@ function processMessages(topic, message) {
       let nextValue = message;
 
       // Real MQTT messages are UTF-8 encoded, so we need to decode them
-      //if (!mockDataEnabled) {
-      //  let nextValue = new TextDecoder('utf-8').decode(nextValue);
-      //}
+      if (!mockDataEnabled) {
+        let nextValue = new TextDecoder("utf-8").decode(nextValue);
+      }
 
       // Push next value to appropriate sensor data object
       currentSensorData.labels.push(Date.now());
