@@ -92,7 +92,6 @@ let dataObject = {
 let temperatureHumidityData = {
   labels: [],
   data: [],
-  // data2H: []
 };
 
 let gasData = {
@@ -361,7 +360,6 @@ function processMessages(topic, message) {
 
     // Sensor device has sent sensor data
     case inputDeviceTemperatureHumiditySensorTopic:
-      console.log(message);
     case inputDeviceGasSensorTopic:
     case inputDeviceTiltSensorTopic:
     case inputDeviceVibrationSensorTopic:
@@ -374,7 +372,7 @@ function processMessages(topic, message) {
 
       // Push next value to appropriate sensor data object
       currentSensorData.labels.push(Date.now());
-      currentSensorData.data.push(parseInt(message));
+      currentSensorData.data.push(parseFloat(message));
 
       // Remove first data point when we have too many
       if (currentSensorData.labels.length >= maxReadings) {
@@ -536,6 +534,9 @@ function displayTotalReadings() {
     case "vibration":
       readingsSoFarEl.innerHTML = totalReadings.vibration;
       break;
+
+    default:
+      readingsSoFarEl.innerHTML = totalReadings.temperatureHumidity;
   }
 }
 
