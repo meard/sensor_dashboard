@@ -490,7 +490,7 @@ function displayTriggerCount() {
   let currentTriggers;
 
   switch (currentSensor) {
-    case "temperature":
+    case "temperatureHumidity":
       currentTriggers = triggers.temperatureHumidity;
       break;
 
@@ -584,8 +584,8 @@ function addNewTrigger(e) {
     let thresholdEl = document.querySelector(
       '#add-trigger-panel input[name="threshold-value"]'
     );
-    let motorActionEl = document.querySelector(
-      '#add-trigger-panel input[name="motor-action"]:checked'
+    let PrinterActionEl = document.querySelector(
+      '#add-trigger-panel input[name="printer-action"]:checked'
     );
 
     // For demo purposes, forget about form validation and just make sure the values aren't null
