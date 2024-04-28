@@ -72,7 +72,7 @@ let triggers = {
 const maxReadings = 10;
 let liveChart;
 const chartCanvasEl = document.getElementById("live-chart");
-
+let currentSensorData;
 // Base data object for live chart
 let dataObject = {
   labels: [],
@@ -109,7 +109,6 @@ let vibrationData = {
   data: [],
 };
 
-let currentSensorData = temperatureHumidityData;
 
 // Live chart configuration - optionsObject
 let optionsObject = {
@@ -192,7 +191,7 @@ window.addEventListener("DOMContentLoaded", function (e) {
     data: dataObject,
     options: optionsObject,
   });
-
+  currentSensorData = temperatureHumidityData;
   console.log("Default Sensor: " + currentSensor);
   // Periodically check input/output devices for keep-alive messages
   // setInterval(checkDevices, 3000);
@@ -206,9 +205,6 @@ window.addEventListener("DOMContentLoaded", function (e) {
   // Switch data streams when sensor selection is changed
   inputSensorSelectedEl.addEventListener("change", function (e) {
     currentSensor = e.target.value || "temperature";
-
-    console.log(currentSensor);
-
     switch (currentSensor) {
       case "temperature":
         currentSensorData = temperatureHumidityData;
@@ -216,21 +212,25 @@ window.addEventListener("DOMContentLoaded", function (e) {
         break;
 
       case "gas":
+        console.log("In gas");
         currentSensorData = gasData;
         resetDataTable();
         break;
 
       case "tilt":
+        console.log("In tilt");
         currentSensorData = tiltData;
         resetDataTable();
         break;
 
       case "vibration":
+        console.log("In vibration");
         currentSensorData = vibrationData;
         resetDataTable();
         break;
 
       default:
+        console.log("In Default");
         currentSensorData = temperatureHumidityData;
         resetDataTable();
         break;
