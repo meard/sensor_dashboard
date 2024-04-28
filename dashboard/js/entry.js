@@ -385,27 +385,19 @@ function processMessages(topic, message) {
 
     // Sensor device has sent sensor data
     case inputDeviceTemperatureHumiditySensorTopic:
-      if (currentSensor == "temperture") {
-        generateGraphComponent(message);
-      }
+      generateGraphComponent(message);
       break;
 
     case inputDeviceGasSensorTopic:
-      if (currentSensor == "gas") {
-        generateGraphComponent(message);
-      }
+      generateGraphComponent(message);
       break;
 
     case inputDeviceTiltSensorTopic:
-      if (currentSensor == "tilt") {
-        generateGraphComponent(message);
-      }
+      generateGraphComponent(message);
       break;
 
     case inputDeviceVibrationSensorTopic:
-      if (currentSensor == "vibration") {
-        generateGraphComponent(message);
-      }
+      generateGraphComponent(message);
       break;
   }
 }
