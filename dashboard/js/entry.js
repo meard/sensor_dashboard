@@ -164,7 +164,8 @@ window.addEventListener("DOMContentLoaded", function (e) {
     data: dataObject,
     options: optionsObject,
   });
-  console.log("Default Sensor: " + curr);
+  
+  console.log("Default Sensor: " + currentSensor);
   // Periodically check input/output devices for keep-alive messages
   // setInterval(checkDevices, 3000);
 
@@ -492,7 +493,7 @@ function displayTriggerCount() {
   let currentTriggers;
 
   switch (currentSensor) {
-    case "temperatureHumidity":
+    case "temperature":
       currentTriggers = triggers.temperatureHumidity;
       break;
 
