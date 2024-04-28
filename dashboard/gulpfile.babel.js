@@ -7,6 +7,7 @@ let browserify = require('browserify'),
   babel = require('gulp-babel'),
   rename = require('gulp-rename'),
   connect = require('gulp-connect'),
+  livereload   = require('gulp-livereload'),
   open = require('gulp-open'),
   sass = require('gulp-sass');
 
