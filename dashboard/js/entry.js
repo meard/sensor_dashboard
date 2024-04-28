@@ -112,7 +112,7 @@ let vibrationData = {
 let currentSensorData = temperatureHumidityData;
 
 // Live chart configuration - optionsObject
-let options1Object = {
+let optionsObject = {
   events: [], // disables tooltips on data points
   xAxisID: "Values",
   yAxisID: "Timestamp",
@@ -139,33 +139,33 @@ let options1Object = {
   },
 };
 
-// Live chart configuration
-let options2Object = {
-  events: [], // disables tooltips on data points
-  xAxisID: "Values",
-  yAxisID: "Timestamp",
-  legend: {
-    display: false,
-  },
-  animation: false,
-  scales: {
-    xAxes: [
-      {
-        ticks: {
-          display: false,
-        },
-      },
-    ],
-    yAxes: [
-      {
-        ticks: {
-          beginAtZero: true,
-          max: 2,
-        },
-      },
-    ],
-  },
-};
+// // Live chart configuration
+// let options2Object = {
+//   events: [], // disables tooltips on data points
+//   xAxisID: "Values",
+//   yAxisID: "Timestamp",
+//   legend: {
+//     display: false,
+//   },
+//   animation: false,
+//   scales: {
+//     xAxes: [
+//       {
+//         ticks: {
+//           display: false,
+//         },
+//       },
+//     ],
+//     yAxes: [
+//       {
+//         ticks: {
+//           beginAtZero: true,
+//           max: 2,
+//         },
+//       },
+//     ],
+//   },
+// };
 
 // Mock data generation
 let mockDataEnabled = false;
@@ -190,7 +190,7 @@ window.addEventListener("DOMContentLoaded", function (e) {
   liveChart = new Chart(chartCanvasEl, {
     type: "line",
     data: dataObject,
-    options: options1Object,
+    options: optionsObject,
   });
 
   console.log("Default Sensor: " + currentSensor);
@@ -412,22 +412,6 @@ function processMessages(topic, message) {
 
 // Generate sensor graph for individual sensors
 function generateGraphComponent(message) {
-  if (currentSensor == "temperature") {
-    // Re-initialize chart to display new data
-    liveChart = new Chart(chartCanvasEl, {
-      type: "line",
-      data: dataObject,
-      options: options1Object,
-    });
-  } else {
-    // Re-initialize chart to display new data
-    liveChart = new Chart(chartCanvasEl, {
-      type: "line",
-      data: dataObject,
-      options: options2Object,
-    });
-  }
-
   let nextValue = message;
 
   // Real MQTT messages are UTF-8 encoded, so we need to decode them
@@ -451,28 +435,19 @@ function generateGraphComponent(message) {
 
   // Only refresh the UI at the interval requested by the user
   if (Date.now() > lastDisplayUpdate + displayInterval && !isPaused) {
-    if (currentSensor == "temperature") {
-      // Re-initialize chart to display new data
-      liveChart = new Chart(chartCanvasEl, {
-        type: "line",
-        data: dataObject,
-        options: options1Object,
-      });
-    } else {
-      // Re-initialize chart to display new data
-      liveChart = new Chart(chartCanvasEl, {
-        type: "line",
-        data: dataObject,
-        options: options2Object,
-      });
-    }
+    // Re-initialize chart to display new data
+    liveChart = new Chart(chartCanvasEl, {
+      type: "line",
+      data: dataObject,
+      options: optionsObject,
+    });
 
     // Create new row in visually-hidden data table
     let row = document.createElement("tr");
     row.innerHTML = `
-      <td>${nextValue}</td>
-      <td>${new Date()}</td>
-    `;
+        <td>${nextValue}</td>
+        <td>${new Date()}</td>
+      `;
 
     let tbody = document.querySelector("#sensor-data tbody");
     let firstRow = tbody.querySelector("tr");
