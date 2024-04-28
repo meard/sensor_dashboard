@@ -49,7 +49,9 @@ let inputDeviceStatusEl = document.getElementById("input-device-status");
 let outputDeviceStatusEl = document.getElementById("output-device-status");
 
 // Current sensor
-let currentSensor = inputSensorSelectedEl.value;
+// let currentSensor = inputSensorSelectedEl.value;
+let currentSensor = "temperature";
+
 
 // Sensor data
 let totalReadings = {
@@ -196,6 +198,11 @@ window.addEventListener("DOMContentLoaded", function (e) {
 
       case "vibration":
         currentSensorData = vibrationData;
+        resetDataTable();
+        break;
+
+      default:
+        currentSensorData = temperatureHumidityData;
         resetDataTable();
         break;
     }
@@ -501,6 +508,7 @@ function displayTriggerCount() {
     case "vibration":
       currentTriggers = triggers.vibration;
       break;
+  
   }
 
   let triggerCountEl = document.querySelector("#triggers-set-up .value");
@@ -687,6 +695,9 @@ function displayTriggers() {
     case "vibration":
       currentTriggers = triggers.vibration;
       break;
+    
+    default:
+      currentTriggers = triggers.temperatureHumidity;
   }
 
   let columns = document.querySelectorAll("#current-triggers .column");
