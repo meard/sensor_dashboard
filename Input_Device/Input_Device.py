@@ -31,6 +31,7 @@ import dht11
 # sensorData_Tilt_time = []
 # sensorData_Vibration_time = []
 
+
 class client_inputDevice:
     def __init__(self):
         print("[INFO] Setting up primary initilizations")
@@ -38,7 +39,6 @@ class client_inputDevice:
         self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
         self.client_server = "test.mosquitto.org"
 
-        
         # sensor value
         self.sensorData_Temperature = []
         self.sensorData_Gas = []
@@ -204,45 +204,53 @@ class client_inputDevice:
             GPIO.cleanup()
 
     def generate_log_within_class(self):
-        print("[INFO] Generating Log File in CSV format....")
-        #log_file = 'sensorData/'+str(time.strftime("%Y%m%d-%H%M%S")) + \
-        #    '_sensorData.csv'
-        sensorData_Temp = pd.DataFrame(
-            {
-                'Time - Temperature':   self.sensorData_Temperature_time,
-                'Temperature Value':    self.sensorData_Temperature
+        try:
+            print("[INFO] Generating Log File in CSV format....")
+            
+            log_file_1 = 'sensorData/'+str(time.strftime("%Y%m%d-%H%M%S")) + \
+                '_sensor_Temperature_Humidity.csv'
+            sensorData_Temp = pd.DataFrame(
+                {
+                    'Time - Temperature':   self.sensorData_Temperature_time,
+                    'Temperature Value':    self.sensorData_Temperature
                 })
-        
-        sensorData_Gas = pd.DataFrame(
-            {
-                'Time - Gas':           self.sensorData_Gas,
-                'Gas Value':            self.sensorData_Gas_time
-     
+            sensorData_Temp.to_csv(log_file_1, index=False)
+
+            log_file_2 = 'sensorData/'+str(time.strftime("%Y%m%d-%H%M%S")) + \
+                '_sensor_Gas.csv'
+            sensorData_Gas = pd.DataFrame(
+                {
+                    'Time - Gas':           self.sensorData_Gas,
+                    'Gas Value':            self.sensorData_Gas_time
+
                 })
-        
-        sensorData_Tilt = pd.DataFrame(
-            {
-                'Time - Tilt':          self.sensorData_Tilt,
-                'Tilt Value':           self.sensorData_Tilt_time
+            sensorData_Gas.to_csv(log_file_2, index=False)
+
+            log_file_3 = 'sensorData/'+str(time.strftime("%Y%m%d-%H%M%S")) + \
+                '_sensor_Tilt.csv'
+            sensorData_Tilt = pd.DataFrame(
+                {
+                    'Time - Tilt':          self.sensorData_Tilt,
+                    'Tilt Value':           self.sensorData_Tilt_time
                 })
-        
-        sensorData_Vibration = pd.DataFrame(
-            {
-                'Time - Vibration':     self.sensorData_Vibration,
-                'Vibration Value':      self.sensorData_Vibration_time,
+            sensorData_Tilt.to_csv(log_file_3, index=False)
+
+            log_file_4 = 'sensorData/'+str(time.strftime("%Y%m%d-%H%M%S")) + \
+                '_sensor_Vibration.csv'
+            sensorData_Vibration = pd.DataFrame(
+                {
+                    'Time - Vibration':     self.sensorData_Vibration,
+                    'Vibration Value':      self.sensorData_Vibration_time,
                 })
+            sensorData_Vibration.to_csv(log_file_4, index=False)
         
-        print("[INFO] Sensor Temperature Data: ", sensorData_Temp)
-        print("[INFO] Sensor Gas Data: ", sensorData_Gas)
-        print("[INFO] Sensor Tilt Data: ", sensorData_Tilt)
-        print("[INFO] Sensor Vibration Data: ", sensorData_Vibration)
-        
-        #print(sensorData)
-                #sensorData.to_csv(log_file, index=False)
-    
+        except Exception as e:
+            print("[ERROR] Log File generation Failed.")
+            print(e)
+
     def generate_log_global(self):
         pass
-    
+
     def run(self, client):
         print("[INFO] Initializing primary sensor threads ")
         time.sleep(3)
