@@ -346,10 +346,10 @@ function processMessages(topic, message) {
       let status = new TextDecoder("utf-8").decode(sensor_status);
       // console.log(status);
       if (status == "true") {
-        inputDeviceOnline = !inputDeviceOnline;
+        inputDeviceOnline = true;
         displayDeviceStatus();
       } else if (status == "false") {
-        inputDeviceOnline = !inputDeviceOnline;
+        inputDeviceOnline = false;
         displayDeviceStatus();
       }
 
