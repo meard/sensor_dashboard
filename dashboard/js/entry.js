@@ -49,7 +49,7 @@ let inputDeviceStatusEl = document.getElementById("input-device-status");
 let outputDeviceStatusEl = document.getElementById("output-device-status");
 
 // Current sensor
-let currentSensor = inputSensorSelectedEl.value;
+let currentSensor = inputSensorSelectedEl.value || "temperature";
 let default_currentSensor = "temperature";
 
 // Sensor data
@@ -164,7 +164,7 @@ window.addEventListener("DOMContentLoaded", function (e) {
     data: dataObject,
     options: optionsObject,
   });
-
+  console.log("Default Sensor: " + curr);
   // Periodically check input/output devices for keep-alive messages
   // setInterval(checkDevices, 3000);
 
@@ -176,7 +176,7 @@ window.addEventListener("DOMContentLoaded", function (e) {
 
   // Switch data streams when sensor selection is changed
   inputSensorSelectedEl.addEventListener("change", function (e) {
-    currentSensor = e.target.value;
+    currentSensor = e.target.value || "temperature";
 
     console.log(currentSensor);
     
