@@ -143,18 +143,18 @@ function setYAxisScale(min, max) {
 
 // Mock data generation
 let mockDataEnabled = false;
-let mockDataInterval;
-let mockDataTarget = getRandomInt(0, 4096);
-let mockDataVelocity = 300;
-let mockDataCurrent = getRandomInt(0, 4096);
+// let mockDataInterval;
+// let mockDataTarget = getRandomInt(0, 4096);
+// let mockDataVelocity = 300;
+// let mockDataCurrent = getRandomInt(0, 4096);
 
-mockDataInterval = setInterval(setMockDataTarget, getRandomInt(1000, 5000));
+// mockDataInterval = setInterval(setMockDataTarget, getRandomInt(1000, 5000));
 
-function setMockDataTarget() {
-  mockDataTarget = getRandomInt(0, 4096);
-  clearInterval(mockDataInterval);
-  mockDataInterval = setInterval(setMockDataTarget, getRandomInt(1000, 5000));
-}
+// function setMockDataTarget() {
+//   mockDataTarget = getRandomInt(0, 4096);
+//   clearInterval(mockDataInterval);
+//   mockDataInterval = setInterval(setMockDataTarget, getRandomInt(1000, 5000));
+// }
 
 //================================================
 //  Main program setup
