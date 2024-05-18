@@ -399,7 +399,7 @@ function processMessages(topic, message) {
 }
 
 // Generate sensor graph for individual sensors
-function generateGraphComponent(message) {
+async function generateGraphComponent(message) {
   let nextValue = message;
 
   // Real MQTT messages are UTF-8 encoded, so we need to decode them
