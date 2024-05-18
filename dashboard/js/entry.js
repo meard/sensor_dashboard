@@ -1,6 +1,6 @@
 // Packages
 let mqtt = require("mqtt");
-let charts = require("chart.js");
+let chart = require("chart.js");
 
 // MQTT setup
 let client = mqtt.connect("wss://test.mosquitto.org:8081");
@@ -404,7 +404,7 @@ function generateGraphComponent(message) {
 
   // Real MQTT messages are UTF-8 encoded, so we need to decode them
   if (!mockDataEnabled) {
-    let nextValue = new TextDecoder("utf-8").decode(nextValue);
+    //let nextValue = new TextDecoder("utf-8").decode(nextValue);
   }
 
   // Push next value to appropriate sensor data object

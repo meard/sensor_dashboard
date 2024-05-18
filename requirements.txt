@@ -2,3 +2,5 @@ adafruit-circuitpython-dht
 platformio
 paho-mqtt
 wifi
+seaborn
+scikit-learn

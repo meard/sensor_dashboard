@@ -10,7 +10,6 @@ import string
 import csv
 import pandas as pd
 import json
-import time
 import numpy as np
 
 # user imports
@@ -79,7 +78,7 @@ class client_inputDevice:
         print("[INFO] Running Temperature Sensor Thread ")
         time.sleep(1)
 
-        # read data using pin 17
+        # read data using pin 7
         dht_channel = dht11.DHT11(pin=7)
         log_file = 'sensorData/'+str(time.strftime("%Y%m%d-%H%M%S")) + \
             '_sensor_Temperature_Humidity.csv'
