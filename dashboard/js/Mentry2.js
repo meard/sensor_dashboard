@@ -16,6 +16,10 @@ let lastDisplayUpdate = Date.now();
 const inputDeviceStatusTopic = "iothackday/dfe/input-device";
 const outputDeviceStatusTopic = "iothackday/dfe/output-device";
 
+// const inputDeviceDistanceSensorTopic = 'iothackday/dfe/input-device/distance';
+// const inputDeviceTemperatureSensorTopic = 'iothackday/dfe/input-device/temperature';
+// const inputDeviceLightSensorTopic = 'iothackday/dfe/input-device/light';
+
 const inputDeviceTemperatureHumiditySensorTopic =
   "iothackday/dfe/input-device/temperatureHumidity";
 const inputDeviceGasSensorTopic = "iothackday/dfe/input-device/gas";
@@ -128,18 +132,40 @@ let optionsObject = {
       {
         ticks: {
           beginAtZero: true,
+          max: 50,
         },
       },
     ],
   },
 };
 
-// Set y-axis scale based on sensor type
-function setYAxisScale(min, max) {
-  liveChart.options.scales.yAxes[0].ticks.min = min;
-  liveChart.options.scales.yAxes[0].ticks.max = max;
-  liveChart.update();
-}
+// // Live chart configuration
+// let options2Object = {
+//   events: [], // disables tooltips on data points
+//   xAxisID: "Values",
+//   yAxisID: "Timestamp",
+//   legend: {
+//     display: false,
+//   },
+//   animation: false,
+//   scales: {
+//     xAxes: [
+//       {
+//         ticks: {
+//           display: false,
+//         },
+//       },
+//     ],
+//     yAxes: [
+//       {
+//         ticks: {
+//           beginAtZero: true,
+//           max: 2,
+//         },
+//       },
+//     ],
+//   },
+// };
 
 // Mock data generation
 let mockDataEnabled = false;
@@ -183,31 +209,26 @@ window.addEventListener("DOMContentLoaded", function (e) {
       case "temperature":
         currentSensorData = temperatureHumidityData;
         resetDataTable();
-        setYAxisScale(0, 50);
         break;
 
       case "gas":
         currentSensorData = gasData;
         resetDataTable();
-        setYAxisScale(0, 5);
         break;
 
       case "tilt":
         currentSensorData = tiltData;
         resetDataTable();
-        setYAxisScale(0, 5);
         break;
 
       case "vibration":
         currentSensorData = vibrationData;
         resetDataTable();
-        setYAxisScale(0, 5);
         break;
 
       default:
         currentSensorData = temperatureHumidityData;
         resetDataTable();
-        setYAxisScale(0, 50);
         break;
     }
 
@@ -248,6 +269,71 @@ window.addEventListener("DOMContentLoaded", function (e) {
   displayTriggers();
 });
 
+// //==========================
+// //  Mock data creation
+// //==========================
+// if (mockDataEnabled) {
+//   setInterval(createMockInputData, 100);
+//   setInterval(createMockKeepAliveMessages, 500);
+
+//   // Artificially set input and output device statuses to "online" within 5s of page load
+//   setTimeout(() => {
+//     inputDeviceOnline = true;
+//     inputDeviceFirstPing = true;
+//     displayDeviceStatus();
+//   }, getRandomInt(1500, 4000));
+
+//   setTimeout(() => {
+//     outputDeviceOnline = true;
+//     outputDeviceFirstPing = true;
+//     displayDeviceStatus();
+//   }, getRandomInt(1500, 4000));
+// }
+
+// // Generate random data for the active sensor, if the input device is online
+// function createMockInputData() {
+//   if (inputDeviceOnline && mockDataEnabled) {
+//     if (mockDataCurrent != mockDataTarget) {
+//       if (mockDataCurrent + mockDataVelocity < mockDataTarget) {
+//         mockDataCurrent += mockDataVelocity;
+//       } else if (mockDataCurrent - mockDataVelocity > mockDataTarget) {
+//         mockDataCurrent -= mockDataVelocity;
+//       }
+//     } else {
+//       mockDataTarget = getRandomInt(0, 4096);
+//     }
+
+//     // Send random data on appropriate MQTT topics
+//     switch (currentSensor) {
+//       case 'distance':
+//         processMessages(inputDeviceDistanceSensorTopic, mockDataCurrent);
+//         break;
+
+//       case 'temperature':
+//         processMessages(inputDeviceTemperatureSensorTopic, mockDataCurrent);
+//         break;
+
+//       case 'light':
+//         processMessages(inputDeviceLightSensorTopic, mockDataCurrent);
+//         break;
+
+//     }
+//   }
+// }
+
+// // Generate fake "keep alive" messages as though devices were online
+// function createMockKeepAliveMessages() {
+//   if (mockDataEnabled) {
+//     if (inputDeviceFirstPing) {
+//       processMessages(inputDeviceStatusTopic, 'online');
+//     }
+
+//     if (outputDeviceFirstPing) {
+//       processMessages(outputDeviceStatusTopic, 'online');
+//     }
+//   }
+// }
+
 //=======================================
 //  Set up and manage MQTT connection
 //=======================================
@@ -267,7 +353,7 @@ if (!mockDataEnabled) {
 
     // Process messages when they arrive through any of the subscribed topics
     client.on("message", (topic, message) => {
-      processMessages(topic, message.toString());
+      processMessages(topic, message);
     });
   });
 }
@@ -282,10 +368,12 @@ function processMessages(topic, message) {
     // Input device has sent keep-alive message
     case inputDeviceStatusTopic:
       let sensor_status = message;
-      if (sensor_status === "true") {
+      let status = new TextDecoder("utf-8").decode(sensor_status);
+      // console.log(status);
+      if (status == "true") {
         inputDeviceOnline = true;
         displayDeviceStatus();
-      } else if (sensor_status === "false") {
+      } else if (status == "false") {
         inputDeviceOnline = false;
         displayDeviceStatus();
       }
@@ -293,8 +381,17 @@ function processMessages(topic, message) {
 
     // Sensor device has sent sensor data
     case inputDeviceTemperatureHumiditySensorTopic:
+      generateGraphComponent(message);
+      break;
+
     case inputDeviceGasSensorTopic:
+      generateGraphComponent(message);
+      break;
+
     case inputDeviceTiltSensorTopic:
+      generateGraphComponent(message);
+      break;
+
     case inputDeviceVibrationSensorTopic:
       generateGraphComponent(message);
       break;
@@ -303,16 +400,16 @@ function processMessages(topic, message) {
 
 // Generate sensor graph for individual sensors
 async function generateGraphComponent(message) {
-  let nextValue = parseFloat(message);
+  let nextValue = message;
 
-  // // Real MQTT messages are UTF-8 encoded, so we need to decode them
-  // if (!mockDataEnabled) {
-  //   //let nextValue = new TextDecoder("utf-8").decode(nextValue);
-  // }
+  // Real MQTT messages are UTF-8 encoded, so we need to decode them
+  if (!mockDataEnabled) {
+    //let nextValue = new TextDecoder("utf-8").decode(nextValue);
+  }
 
   // Push next value to appropriate sensor data object
   currentSensorData.labels.push(Date.now());
-  currentSensorData.data.push(nextValue);
+  currentSensorData.data.push(parseFloat(message));
 
   // Remove first data point when we have too many
   if (currentSensorData.labels.length >= maxReadings) {
@@ -327,12 +424,12 @@ async function generateGraphComponent(message) {
   // Only refresh the UI at the interval requested by the user
   if (Date.now() > lastDisplayUpdate + displayInterval && !isPaused) {
     // Re-initialize chart to display new data
-    // liveChart = new Chart(chartCanvasEl, {
-    //   type: "line",
-    //   data: dataObject,
-    //   options: optionsObject,
-    // });
-    liveChart.update();
+    liveChart = new Chart(chartCanvasEl, {
+      type: "line",
+      data: dataObject,
+      options: optionsObject,
+    });
+
     // Create new row in visually-hidden data table
     let row = document.createElement("tr");
     row.innerHTML = `
@@ -341,8 +438,8 @@ async function generateGraphComponent(message) {
       `;
 
     let tbody = document.querySelector("#sensor-data tbody");
-    // let firstRow = tbody.querySelector("tr");
-    let firstRow = tbody.querySelector("tr:first-child");
+    let firstRow = tbody.querySelector("tr");
+
     // Insert new row into the data table
     if (firstRow == undefined) {
       tbody.append(row);
@@ -403,7 +500,7 @@ function resetDataTable() {
     let row = document.createElement("tr");
     row.innerHTML = `
       <td>${currentSensorData.data[i]}</td>
-      <td>${new Date(currentSensorData.labels[i])}</td>
+      <td>${currentSensorData.labels[i]}</td>
     `;
     tbody.appendChild(row);
   }
