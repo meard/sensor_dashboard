@@ -143,18 +143,6 @@ function setYAxisScale(min, max) {
 
 // Mock data generation
 let mockDataEnabled = false;
-// let mockDataInterval;
-// let mockDataTarget = getRandomInt(0, 4096);
-// let mockDataVelocity = 300;
-// let mockDataCurrent = getRandomInt(0, 4096);
-
-// mockDataInterval = setInterval(setMockDataTarget, getRandomInt(1000, 5000));
-
-// function setMockDataTarget() {
-//   mockDataTarget = getRandomInt(0, 4096);
-//   clearInterval(mockDataInterval);
-//   mockDataInterval = setInterval(setMockDataTarget, getRandomInt(1000, 5000));
-// }
 
 //================================================
 //  Main program setup
@@ -305,11 +293,6 @@ function processMessages(topic, message) {
 async function generateGraphComponent(message) {
   let nextValue = parseFloat(message);
 
-  // // Real MQTT messages are UTF-8 encoded, so we need to decode them
-  // if (!mockDataEnabled) {
-  //   //let nextValue = new TextDecoder("utf-8").decode(nextValue);
-  // }
-
   // Push next value to appropriate sensor data object
   currentSensorData.labels.push(Date.now());
   currentSensorData.data.push(nextValue);
@@ -326,12 +309,7 @@ async function generateGraphComponent(message) {
 
   // Only refresh the UI at the interval requested by the user
   if (Date.now() > lastDisplayUpdate + displayInterval && !isPaused) {
-    // Re-initialize chart to display new data
-    // liveChart = new Chart(chartCanvasEl, {
-    //   type: "line",
-    //   data: dataObject,
-    //   options: optionsObject,
-    // });
+
     liveChart.update();
     // Create new row in visually-hidden data table
     let row = document.createElement("tr");
@@ -341,7 +319,6 @@ async function generateGraphComponent(message) {
       `;
 
     let tbody = document.querySelector("#sensor-data tbody");
-    // let firstRow = tbody.querySelector("tr");
     let firstRow = tbody.querySelector("tr:first-child");
     // Insert new row into the data table
     if (firstRow == undefined) {

@@ -18,18 +18,6 @@ import wifi
 import RPi.GPIO as GPIO
 import dht11
 
-# # sensor value
-# sensorData_Temperature = []
-# sensorData_Gas = []
-# sensorData_Tilt = []
-# sensorData_Vibration = []
-
-# # sensor value time
-# sensorData_Temperature_time = []
-# sensorData_Gas_time = []
-# sensorData_Tilt_time = []
-# sensorData_Vibration_time = []
-
 
 class client_inputDevice:
     def __init__(self):
@@ -67,10 +55,8 @@ class client_inputDevice:
         # Send keep-alive message so dashboard knows we're still connected
         while True:
             if (sensor):
-                # print("Sensor Status: {}".format(str(self.client.is_connected())))
                 self.client.publish("iothackday/dfe/input-device", "true")
             else:
-                # print("Sensor Status: {}".format(str(self.client.is_connected())))
                 self.client.publish("iothackday/dfe/input-device", "false")
             time.sleep(0.5)
 
@@ -82,7 +68,6 @@ class client_inputDevice:
         dht_channel = dht11.DHT11(pin=7)
         log_file = 'sensorData/'+str(time.strftime("%Y%m%d-%H%M%S")) + \
             '_sensor_Temperature_Humidity.csv'
-        # f = open(log_file, "x", encoding='utf-8')
         try:
             while True:
                 result = dht_channel.read()
@@ -95,9 +80,6 @@ class client_inputDevice:
                 # Wait for a short period before reading again
                 time.sleep(1)
         except (RuntimeError, KeyboardInterrupt, SystemExit) as err:
-            # self.sensorData = pd.DataFrame(
-            #     {'Time - Temperature': self.sensorData_Temperature_time, 'Temperature Value': self.sensorData_Temperature})
-            # self.sensorData.to_csv(log_file, index=False)
             print(err.args[0])
         finally:
             # Clean up GPIO settings
@@ -107,7 +89,7 @@ class client_inputDevice:
         print("[INFO] Running Gas Sensor Thread ")
         time.sleep(1)
 
-        gas_channel = 17  # Replace with the actual GPIO pin number
+        gas_channel = 17
         gas_state = 0
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(gas_channel, GPIO.IN)
@@ -131,9 +113,6 @@ class client_inputDevice:
                 self.sensorData_Gas_time.append(str(time.time()))
                 time.sleep(1)  # Wait for a short period before reading again
         except (RuntimeError, KeyboardInterrupt, SystemExit) as err:
-            # self.sensorData = pd.DataFrame(
-            #     {'Time - Gas': self.sensorData_Gas, 'Gas Value': self.sensorData_Gas_time})
-            # self.sensorData.to_csv(log_file, index=False)
             print(err.args[0])
         finally:
             # Clean up GPIO settings
@@ -163,9 +142,6 @@ class client_inputDevice:
                 self.sensorData_Tilt_time.append(str(time.time()))
                 time.sleep(1)  # Wait for a short period before reading again
         except (RuntimeError, KeyboardInterrupt, SystemExit) as err:
-            # self.sensorData = pd.DataFrame(
-            #     {'Time - Tilt': self.sensorData_Tilt, 'Tilt Value': self.sensorData_Tilt_time})
-            # self.sensorData.to_csv(log_file, index=False)
             print(err.args[0])
 
         finally:
@@ -196,9 +172,6 @@ class client_inputDevice:
                 self.sensorData_Vibration_time.append(str(time.time()))
                 time.sleep(1)  # Wait for a short period before reading again
         except (RuntimeError, KeyboardInterrupt, SystemExit) as err:
-            # self.sensorData = pd.DataFrame(
-            #     {'Time - Vibration': self.sensorData_Vibration, 'Vibration Value': self.sensorData_Vibration_time})
-            # self.sensorData.to_csv(log_file, index=False)
             print(err.args[0])
         finally:
             # Clean up GPIO settings
@@ -263,7 +236,7 @@ class client_inputDevice:
 
                 t1 = threading.Thread(
                     target=self.temperatureHumiditySensor, name="temperatureHumiditySensor")
-                #t2 = threading.Thread(target=self.gasSensor, name="gas")
+                t2 = threading.Thread(target=self.gasSensor, name="gas")
                 t3 = threading.Thread(target=self.tiltSensor, name="tilt")
                 t4 = threading.Thread(
                     target=self.vibrationSensor, name="vibration")
@@ -272,19 +245,19 @@ class client_inputDevice:
                     target=self.sensorStatus, name="Sensor Status", args=(self.client.is_connected(),))
 
                 t1.daemon = True
-                #t2.daemon = True
+                t2.daemon = True
                 t3.daemon = True
                 t4.daemon = True
                 t5.daemon = True
 
                 t1.start()
-                #t2.start()
+                t2.start()
                 t3.start()
                 t4.start()
                 t5.start()
 
                 t1.join()
-                #t2.join()
+                t2.join()
                 t3.join()
                 t4.join()
                 t5.join()
