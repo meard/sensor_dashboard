@@ -1,6 +1,3 @@
-
-![alt text](https://github.com/meard/meard/blob/main/my-header-image.png)
-
 # About the Project
 
 This project has been forked from a very useful template by @JasonWebb (https://github.com/jasonwebb/dashboard-for-everybody, https://jasonwebb.github.io/dashboard-for-everybody/).
